@@ -3,25 +3,30 @@
 @{
 }
 
-
-<div class="container mx-auto w-50">
-    <h3 class = "mt-4 text-center"> Please Login Below </h3><br>
-    <form action="" method = "post">
-        <div class="form-group">
-            <label for="UserName">Username: </label>
-            <input type="text" class="form-control" name = "Username" id="Username" placeholder="Username">
-        </div>
+<h3 class = "mt-4 text-center mx-auto"> Please Login Below </h3><br>
+<div class="container mx-auto w-100 border p-3">
+    <form class="mx-auto w-100 py-2" method = "post">
+        <div class="text-danger" asp-validation-summary="ModelOnly"></div>
         <div class="form-group mt-4">
-            <label for="Password">Password: </label>
-            <input type="password" class="form-control" name = "Pass" id="Pass" placeholder="Password">
+            <label asp-for="Credentials.Username" class="pb-2"></label>
+            <input asp-for="Credentials.Username" type="text" class="form-control pt-2 w-75" name = "Username" id="Username" placeholder="Username" />
+            <span class="text-danger" asp-validation-for="Credentials.Username"></span>
         </div>
-        <input class="btn btn-primary mt-4" type = "submit" value = "Submit">
+
+        <div class="form-group mt-4">
+            <label asp-for="Credentials.Password" class="pb-2"> </label>
+            <input asp-for="Credentials.Password" type="password" class="form-control pt-2 w-75" name = "Pass" id="Pass" placeholder="Password" />
+            <span class="text-danger" asp-validation-for="Credentials.Password"></span>
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary mt-4" type="submit" value = "Login">
+        </div>
     </form>
 
     <br>
-    <p> 
+    <div class=" mx-auto"> 
         Need an account? 
         <a href= "/Account/Register"> Create one Here </a> 
-    </p>
+    </div>
 
 </div>
