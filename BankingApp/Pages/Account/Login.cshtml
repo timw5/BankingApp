@@ -1,7 +1,7 @@
 ﻿@page
 @model BankingApp.Pages.Account.LoginModel
 @{
-
+    ViewData["Title"] = "Login";
 }
 
 <h3 class = "mt-4 text-center mx-auto"> Please Login Below </h3><br>
@@ -11,13 +11,13 @@
         <div class="text-danger" asp-validation-summary="ModelOnly"></div>
         <div class="form-group mt-4">
             <label asp-for="credentials.Username" class="form-label pb-2"></label>
-            <input asp-for="credentials.Username"  type="text" class="form-control pt-2 " placeholder="Username" />
+            <input asp-for="credentials.Username"  type="text" class="form-control" placeholder="Username" />
             <span class="text-danger" asp-validation-for="credentials.Username"></span>
         </div>
 
         <div class="form-group mt-4">
             <label asp-for="credentials.Password" class="pb-2 form-label"> </label>
-            <input asp-for="credentials.Password" type="password" class="form-control pt-2 " name = "Pass" id="Pass" placeholder="Password" />
+            <input asp-for="credentials.Password" type="password" class="form-control" placeholder="Password" />
             <span class="text-danger" asp-validation-for="credentials.Password"></span>
         </div>
         <div class="form-group">
@@ -28,7 +28,7 @@
     <br>
     <div class=" mx-auto"> 
         Need an account? 
-        <a class = "link-primary" href= "/Account/Register"> Create one Here </a> 
+        <a class = "link-primary" href= "/Account/Create"> Create one Here </a> 
     </div>
 </div>
 
