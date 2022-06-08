@@ -28,7 +28,7 @@ namespace BankingApp.Pages.Account
             var hash = Hash(credentials.Password, salt);//string
 
             Login login = new(credentials.Username, hash, Credentials.SaltToString(salt));
-
+            var test = 0;
             //now store username, password, salt, and hash in DB, redirect to account page...
 
         }
