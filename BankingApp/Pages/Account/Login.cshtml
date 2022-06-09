@@ -8,19 +8,24 @@
 <div class="container border rounded-3 p-3 w-100 shadow-lg">
     <div class="container w-75 mx-auto ">
     <form class="mx-auto py-2" method = "post">
+        
         <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+        
         <div class="form-group mt-4">
-            <label asp-for="credentials.Username" class="form-label pb-2"></label>
-            <input asp-for="credentials.Username"  type="text" class="form-control" placeholder="Username" />
-            <span class="text-danger" asp-validation-for="credentials.Username"></span>
+            <label asp-for="Username" class="form-label pb-2"></label>
+            <input asp-for="Username"  type="text" class="form-control" placeholder="Username" />
+            <span class="text-danger" asp-validation-for="Username"></span>
         </div>
 
         <div class="form-group mt-4">
-            <label asp-for="credentials.Password" class="pb-2 form-label"> </label>
-            <input asp-for="credentials.Password" type="password" class="form-control" placeholder="Password" />
-            <span class="text-danger" asp-validation-for="credentials.Password"></span>
+            <label asp-for="Password" class="pb-2 form-label"> </label>
+            <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
+            <span class="text-danger" asp-validation-for="Password"></span>
+            
         </div>
         <div class="form-group">
+            <span class="text-danger mb-4">@Model.LoginError</span>
+            <br />
             <input class="btn btn-primary mt-4" type="submit" value = "Login">
         </div>
     </form>

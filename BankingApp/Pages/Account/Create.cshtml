@@ -11,20 +11,20 @@
     <form class="mx-auto py-2" method = "post">
         <div class="text-danger" asp-validation-summary="ModelOnly"></div>
         <div class="form-group mt-4">
-            <label asp-for="newusr.Username" class="form-label pb-2"></label>
-            <input asp-for="newusr.Username"  type="text" class="form-control" placeholder="Username" />
-            <span class="text-danger" asp-validation-for="newusr.Username"></span>
+            <label asp-for="Username" class="form-label pb-2"> </label>
+            <input asp-for="Username"  type="text" class="form-control" placeholder="Username" />
+            <span class="text-danger" asp-validation-for="Username"></span>
         </div>
 
         <div class="form-group mt-4">
-            <label asp-for="newusr.Password" class="pb-2 form-label"> </label>
-            <input asp-for="newusr.Password" type="password" class="form-control" placeholder="Password" />
-            <span class="text-danger" asp-validation-for="newusr.Password"></span>
+            <label asp-for="Password" class="pb-2 form-label"> </label>
+            <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
+            <span class="text-danger" asp-validation-for="Password"></span>
         </div>
                 <div class="form-group mt-4">
-            <label asp-for="newusr.PasswordConf" class="pb-2 form-label">Confirm Password </label>
-            <input asp-for="newusr.PasswordConf" type="password" class="form-control" placeholder="Confirm Password" />
-            <span class="text-danger" asp-validation-for="newusr.PasswordConf" ></span>
+            <label asp-for="PasswordConf" class="pb-2 form-label">Confirm Password </label>
+            <input asp-for="PasswordConf" type="password" class="form-control" placeholder="Confirm Password" />
+            <span class="text-danger" asp-validation-for="PasswordConf" ></span>
         </div>
         <div class="form-group">
             <input class="btn btn-primary mt-4" type="submit" value = "Login">
@@ -43,4 +43,8 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/lib/jquery-ajax-unobtrusive/dist/jquery.unobtrusive-ajax.min.js"></script>
 }
+

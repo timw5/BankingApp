@@ -1,75 +1,76 @@
+using BankingApp.Data;
 using BankingApp.Models;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
-
+using System.Text;
 
 namespace BankingApp.Pages.Account
 {
     public class LoginModel : PageModel
     {
+        private readonly BankingAppContext _db;
+
+        public LoginModel(BankingAppContext db)
+        {
+            _db = db;
+        }
+
         [BindProperty]
-        public Credentials credentials { get; set; }
+        [Required(ErrorMessage = "Username is Required")]
+        public string Username { get; set; }
+
+        [BindProperty]
+        [Required(ErrorMessage = "Password is Required"), DataType(DataType.Password), MinLength(8, ErrorMessage = "Password must be 8 characters")]
+        public string Password { get; set; }
+
+        [BindProperty]
+        public string LoginError { get; set; }
+
 
         public IActionResult OnGet()
         {
             return Page();
         }
-        
-        public void OnPost()
+
+        public bool IsLoginValid(string username, string password)
         {
-            if(credentials.Password is null || credentials.Username is null)
+            var data = _db.Users.Where(u => u.Username == username).FirstOrDefault();
+            if(data is null || data == default)
+                return false;
+
+            var salt = Convert.FromBase64String(data.Salt);
+            var hash = data.Hash;
+            var testhash = Login.HashPass(password, salt);
+            return testhash == hash;
+        }
+
+
+
+        public IActionResult OnPost()
+        {
+            if (Password == String.Empty || Username == String.Empty)
             {
-                return;
+                LoginError = string.Empty;
+                return Page();
             }
-            var salt = GetSalt();//byte[]
-            var hash = Hash(credentials.Password, salt);//string
-
-            Login login = new(credentials.Username, hash, Credentials.SaltToString(salt));
-            //now store username, password, salt, and hash in DB, redirect to account page...
-
-        }
-
-        public static byte[] GetSalt()
-        {
-            byte[] salt = new byte[128 / 8];
-            using (var rngCsp = new RNGCryptoServiceProvider())
+            else if (IsLoginValid(Username, Password) == false)
             {
-                rngCsp.GetNonZeroBytes(salt);
+                LoginError = "Invalid Username or password";
+                return Page();
+            }
+            else
+            {
+                LoginError = string.Empty;
+                return RedirectToPage("/Index");
             }
 
-            return salt;
         }
 
-        public static string Hash(string password, byte[] salt)
-        {
-           return Convert.ToBase64String(KeyDerivation.Pbkdf2(
-           password: password,
-           salt: salt,
-           prf: KeyDerivationPrf.HMACSHA256,
-           iterationCount: 100000,
-           numBytesRequested: 256 / 8));
-
-        }
-        
  
     }
-    public class Credentials
-    {
-        
-        [Required]
-        public string Username { get; set; }
 
-        [Required, DataType(DataType.Password)]
-        public string Password { get; set; }
-
-
-        public static string SaltToString(byte[] salt)
-        {
-            return Convert.ToBase64String(salt);
-        }
-    }
 
 }
