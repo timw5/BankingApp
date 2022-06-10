@@ -6,7 +6,7 @@ namespace BankingApp.Models
 {
     public class Login
     {
-        public Login(string username, string password)
+        public Login(string username, string password)//constructor for creating a new account
         {
             Username = username;
             var bsalt = GetSalt();
@@ -14,7 +14,7 @@ namespace BankingApp.Models
             Salt = SaltToString(bsalt);
         }
 
-        public Login(string username, string hash, string salt)
+        public Login(string username, string hash, string salt)//constructor for the Context (Entity Framework)
         {
             Username=username;
             Hash = hash;
@@ -22,18 +22,22 @@ namespace BankingApp.Models
         }
 
 
-        public int ID { get; set; }
+        public int ID { get; set; }//primary key
 
         [Required]
-        public string Username { get; set; }
+        public string Username { get; set; }//nothing fancy
 
         [Required]
-        public string Hash { get; set; } 
+        public string Hash { get; set; }//also stored as a base64 string
 
         [Required]
-        public string Salt { get; set; } 
+        public string Salt { get; set; }//stored as a base64 string, but must be a byte[] to use it for hashing
 
 
+
+        //this is a recommended hashing algorithm from microsoft, although it requires a byte array for the salt,
+        //sql will store this value as a string(Base64 string), I store it in this object as a string, but when I 
+        //am verifying the hash when the user logs in, I cast the string back to a byte[] using FromBase64String() method.
         public static string HashPass(string password, byte[] salt)
         {
             return Convert.ToBase64String(KeyDerivation.Pbkdf2(
@@ -45,6 +49,8 @@ namespace BankingApp.Models
 
         }
 
+
+        //generate random salt as a byte[]
         public static byte[] GetSalt()
         {
             byte[] salt = new byte[128 / 8];
@@ -56,6 +62,7 @@ namespace BankingApp.Models
             return salt;
         }
 
+        //casting the byte[] to a base64 string
         public static string SaltToString(byte[] salt)
         {
             return Convert.ToBase64String(salt);

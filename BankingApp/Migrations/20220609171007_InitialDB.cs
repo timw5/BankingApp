@@ -1,6 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
+/// <summary>
+/// This page is for managing our database
+/// up creates tables, down deletes them
+/// </summary>
+
 
 namespace BankingApp.Migrations
 {

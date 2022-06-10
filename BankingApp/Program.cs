@@ -8,8 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-//builder.Services.AddDbContext<BankingAppContext>(options =>
-//    options.UseSqlServer(builder.Configuration.GetConnectionString("BankingAppContext") ?? throw new InvalidOperationException("Connection string 'BankingAppContext' not found.")));
+//Configuring our database access with our context variable, using the "Default" connection string
+//the connection string is currently stored in appsettings.JSON
 builder.Services.AddDbContext<BankingAppContext>(options =>{
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
