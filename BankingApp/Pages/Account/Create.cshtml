@@ -1,9 +1,14 @@
 ﻿@page
-@model BankingApp.Pages.Account.CreateModel
+@model BankingApp.Pages.Account.CreateModel//aka RegisterModel...I need to change the name
 
 @{
     ViewData["Title"] = "Register";
 }
+@*asp-validation summary is setting up validation to be based on the model *@
+@*asp-for specifies what property from the model is bound to that element*@
+@*asp-validatino-for is specifying what property the form has an error with*@
+@*The rest is just HTML and Bootstrap*@
+
 
 <h3 class = "mt-4 text-center mx-auto"> Create A New Account</h3><br>
 <div class="container border rounded-3 p-3 w-100 shadow-lg">
