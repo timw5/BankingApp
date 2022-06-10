@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BankingApp.Migrations
 {
     [DbContext(typeof(BankingAppContext))]
-    [Migration("20220610050415_AccountTables")]
-    partial class AccountTables
+    [Migration("20220610201916_InitialDB")]
+    partial class InitialDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -38,6 +38,9 @@ namespace BankingApp.Migrations
                     b.Property<int>("Dollars")
                         .HasColumnType("int");
 
+                    b.Property<int>("LoginID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -47,6 +50,8 @@ namespace BankingApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("LoginID");
 
                     b.ToTable("Accounts");
                 });
@@ -106,6 +111,22 @@ namespace BankingApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Transfers");
+                });
+
+            modelBuilder.Entity("BankingApp.Models.Account", b =>
+                {
+                    b.HasOne("BankingApp.Models.Login", "Login")
+                        .WithMany("Accounts")
+                        .HasForeignKey("LoginID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Login");
+                });
+
+            modelBuilder.Entity("BankingApp.Models.Login", b =>
+                {
+                    b.Navigation("Accounts");
                 });
 #pragma warning restore 612, 618
         }

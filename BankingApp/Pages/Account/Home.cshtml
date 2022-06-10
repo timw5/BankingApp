@@ -1,0 +1,47 @@
+﻿@page
+@model BankingApp.Pages.Account.AccountModel
+
+@{
+    ViewData["Title"] = "Account";
+
+}
+<style>
+    .linkto:active, .linkto:hover{
+
+        border-color : dodgerblue!important; 
+    }
+</style>
+
+    <div class="container shadow-lg border rounded-3">
+        <div class="container mx-auto mt-2">
+            <h1 class="text-center my-4">Welcome @Model.User.Username</h1>
+            <div class="row container ">
+                @foreach (var item in Model._Account)
+
+                {
+                    <div class="col-md-3 m-4 p-4 border rounded-2 shadow-lg linkto" :hover onclick="location.href=#" style="cursor: pointer" title="View Transactions">
+                        <div class="h3 fw-bold mb-2 text-center  ">@item.Type</div>
+                        <hr/>
+                            <div class="col-sm-2 fw-bold">
+                                Name:
+                            </div>
+                            <div class="col-sm-10">
+                                @item.Name
+                            </div>
+                            <div class="col-sm-2 fw-bold">
+                                Balance:
+                            </div>
+                            <div class="col-sm-10">
+                                @item.BalanceToString()
+                            </div>
+                        <button class="btn btn-success mt-4" id="#AddFunds" type="button">Add Funds</button>
+                    </div>
+                }
+
+            </div>
+                    <div class="container mx-auto">
+            <button class="btn btn-primary m-4" type="button" id="AddAccount">Add new Account</button>
+        </div>
+        </div>
+
+    </div>

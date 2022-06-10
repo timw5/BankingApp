@@ -16,9 +16,10 @@ namespace BankingApp.Models
 
         public Login(string username, string hash, string salt)//constructor for the Context (Entity Framework)
         {
-            Username=username;
+            Username = username;
             Hash = hash;
             Salt = salt;
+            //Accounts = new List<Account>();
         }
 
 
@@ -32,6 +33,8 @@ namespace BankingApp.Models
 
         [Required]
         public string Salt { get; set; }//stored as a base64 string, but must be a byte[] to use it for hashing
+
+        public ICollection<Account> Accounts { get; set; }
 
 
 

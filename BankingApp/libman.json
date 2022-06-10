@@ -1,3 +1,4 @@
+//This folder manages our Client-side Libraries
 {
   "version": "1.0",
   "defaultProvider": "cdnjs",

@@ -1,18 +1,28 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BankingApp.Models
 {
     public class Account
     {
-        public Account(int dollars, int cents, string name, string type)//constructor for a new account
+        public Account(int dollars, int cents, string name, string type, int loginID, Login usr)//constructor for a new account
         {
             Dollars = dollars;
             Cents = cents;
             Name = name;
             Type = type;
+            LoginID = loginID;
+            Login = usr;
         }
-        
+        public Account()
+        {
+            Dollars = 0;
+            Cents = 0;
+            Name = String.Empty;
+            Type = "Checking";
+            LoginID = 0;
+            Login = default!;
+        }        
         public int ID { get; set; }//primary key
         
         [Required]
@@ -26,6 +36,16 @@ namespace BankingApp.Models
 
         [Required]
         public string Type { get; set; }//type of account (savings, investment, checking, etc..)
+
+        [Required]
+        public int LoginID { get; set; }
+
+        [Required]
+        public Login Login { get; set; }
+
+
+
+
 
 
         public string BalanceToString()//print current balance

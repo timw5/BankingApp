@@ -89,6 +89,8 @@ namespace BankingApp.Pages.Account
 
 
 
+
+
         //When we submit the form, we make sure that no entries in the form
         //are null ( Helper method IsInvalid() ), It is done Asynchronously,
         //it returns a promise of IActionResult(to do an action) once the login information
@@ -106,9 +108,12 @@ namespace BankingApp.Pages.Account
 
             Login Login = new(Username, Password);
             _db.Add(Login);
+            Models.Account account = new(0, 0, Username, "Checking", Login.ID, Login);
+            _db.Accounts.Add(account);
             await _db.SaveChangesAsync();
             
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Account/Home", new { ID = Login.ID });
+
         }
 
 
@@ -119,14 +124,11 @@ namespace BankingApp.Pages.Account
         //Promise (Task) of a JsonResult object,
         //which just ensures that javascript is getting
         //The correct Data type (bool)
-        public async Task<JsonResult> OnPostCheckUsername()
+        public JsonResult OnPostCheckUsername()
         {
-            var x = await (
-                            from b in _db.Users
-                            where b.Username == Username
-                            select b
-                          ).ToListAsync();
 
+            var x = _db.Users.Where(x => x.Username == Username).ToList();
+            
             if (x.Count == 0 || x is null)
                 return new JsonResult(true);
 

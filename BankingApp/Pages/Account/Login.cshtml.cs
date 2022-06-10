@@ -63,16 +63,24 @@ namespace BankingApp.Pages.Account
             var salt = Convert.FromBase64String(data.Salt);
             var hash = data.Hash;
             var testhash = Login.HashPass(password, salt);
+            var ID = data.ID;
+
             return testhash == hash;
         }
 
+        public Login GetLoginInfo(string user, string pass)
+        {
+            var data = _db.Users.Where(u => u.Username == user).FirstOrDefault();
+                return data;
+
+        }
 
         //When we hit submit on our form, we first check to make sure the string's aren't empty,
         //then we pass the username and password provided to the function described above
         //if the login is not valid, we store a message in our "LoginError" property to inject into the webpage
         //and finally, if the passwords match we can redirect to our account page
         //***I currently have it set to /Index because I havent made the Account page yet.
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             if (Password == String.Empty || Username == String.Empty)
             {
@@ -86,8 +94,20 @@ namespace BankingApp.Pages.Account
             }
             else
             {
+                var userData = GetLoginInfo(Username, Password);
+                Models.Account act;
                 LoginError = string.Empty;
-                return RedirectToPage("/Index");
+                var account = _db.Accounts.Where(u => u.LoginID == userData.ID).FirstOrDefault();
+                if (account is null)
+                {
+                    act = new(0, 0, Username,"Checking", userData.ID, userData);
+                    _db.Accounts.Add(act);
+                    await _db.SaveChangesAsync();
+                }
+                else
+                    act = account;
+               
+                return RedirectToPage( "/Account/Home",new {ID = userData.ID});
             }
 
         }
