@@ -13,33 +13,45 @@ namespace BankingApp.Pages.Account
 {
     public class AccountModel : PageModel
     {
-        private readonly BankingApp.Data.BankingAppContext _context;
+        //database context variable
+        private readonly BankingAppContext _context;
 
+
+        //list of accounts attached to the current user
         [BindProperty, Required]
         public ICollection< Models.Account> _Account { get; set; } = default!;
 
+        //user currently logged in
+        [BindProperty, Required]
         public Login User { get; set; }
         
 
 
-
+        //constructor for this model
         public AccountModel(BankingApp.Data.BankingAppContext context)
         {
             _context = context;
         }
 
-
-        public void OnGetLoggedIn(int id)
+ 
+        //this is really messy....needs to be fixed...
+        public IActionResult OnGetAddNewAccount(int id)
         {
+            var user = _context.Users.Where(x => x.ID == id).FirstOrDefault();
+            if (user is not null)
+            {
+                Models.Account account = new(0, 0, user.Username, "Investing", user.ID, user);
+                _context.Accounts.Add(account);
+                _context.SaveChanges();
+            }
+            var url = Url.Page("/Account/Home");
 
-            _Account = new List<Models.Account>();
-            var x = _context.Accounts.Where(x => x.ID == id).FirstOrDefaultAsync().Result;
-            if (x != null)
-                _Account.Add(x);
-            else RedirectToPage("/Login");
-            return;
+            return Redirect(url + $"?Id={id}");
+
         }
 
+
+        //all users start out with a default "Checking" account
 
         public async Task<IActionResult> OnGetAsync(int ID)
         {
@@ -50,6 +62,7 @@ namespace BankingApp.Pages.Account
                 var accounts = _context.Accounts.Where(x=>x.LoginID == User.ID).ToList();
                 if (accounts is null || accounts.Count == 0)
                 {
+                    
                     User.Accounts = new List<Models.Account>();
                     _Account = User.Accounts;
                     Models.Account act = new Models.Account(0, 0, User.Username, "Checking", User.ID, User);
