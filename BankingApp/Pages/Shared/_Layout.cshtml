@@ -33,7 +33,9 @@
                         </li>
                         
                     </ul>
-                    <button class="btn btn-danger"> Logout</button>
+
+                    @*Added logout button, onclick it redirects to the login page, and clears the session variables*@
+                    <a class="btn btn-danger" asp-page-handler="ClearSession" asp-page="/Account/Login"> Logout</a>
                 </div>
             </div>
         </nav>

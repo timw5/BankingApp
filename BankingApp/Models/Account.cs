@@ -5,6 +5,7 @@ namespace BankingApp.Models
 {
     public class Account
     {
+        //constructor for EF
         public Account(int dollars, int cents, string name, string type, int loginID, Login usr)//constructor for a new account
         {
             Dollars = dollars;
@@ -14,7 +15,7 @@ namespace BankingApp.Models
             LoginID = loginID;
             Login = usr;
         }
-        public Account()
+        public Account()//default constructor
         {
             Dollars = 0;
             Cents = 0;
@@ -38,10 +39,10 @@ namespace BankingApp.Models
         public string Type { get; set; }//type of account (savings, investment, checking, etc..)
 
         [Required]
-        public int LoginID { get; set; }
+        public int LoginID { get; set; }//foreign key to Users table (Login class)
 
         [Required]
-        public Login Login { get; set; }
+        public Login Login { get; set; }//User (Login class) that owns this account
 
 
 

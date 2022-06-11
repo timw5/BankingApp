@@ -18,7 +18,10 @@ using Microsoft.EntityFrameworkCore;
 /// 
 /// To actually create the tables in the database:
 /// go to the search bar, search for "Package Manager Console"
-/// Select that, and run the command "Update-Database"
+/// Select that, and run the command: 
+///     "Add-Migrations MigrationName"
+/// then run the command: 
+///     "Update-Database"
 /// 
 /// 
 /// </summary>

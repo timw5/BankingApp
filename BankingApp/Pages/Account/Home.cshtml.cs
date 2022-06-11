@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using BankingApp.Data;
 using BankingApp.Models;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
+
 
 namespace BankingApp.Pages.Account
 {
@@ -19,12 +21,21 @@ namespace BankingApp.Pages.Account
 
         //list of accounts attached to the current user
         [BindProperty, Required]
-        public ICollection< Models.Account> _Account { get; set; } = default!;
+        public ICollection<Models.Account> _Account { get; set; } = default!;
 
         //user currently logged in
         [BindProperty, Required]
         public Login User { get; set; }
-        
+
+        [BindProperty]
+        public int ID { get; set; }
+
+        [BindProperty]
+        [Required]
+        //property for managing the "Add New Account" button, I dont want it
+        //to be displayed if there are alread 3 accounts.
+        public string hidden {get; set;} 
+
 
 
         //constructor for this model
@@ -34,38 +45,72 @@ namespace BankingApp.Pages.Account
         }
 
  
-        //this is really messy....needs to be fixed...
-        public IActionResult OnGetAddNewAccount(int id)
+        //This is the handler for the Add New Account button,
+        //I use the Session Variable "ID" to get the user
+        //that owns this account
+        public async Task<IActionResult> OnGetAddNewAccount()
         {
-            var user = _context.Users.Where(x => x.ID == id).FirstOrDefault();
+            if (HttpContext.Session.Get("ID") != null)
+            {
+                this.ID = (int)HttpContext.Session.GetInt32("ID");
+            }
+            var user = await _context.Users.Where(x => x.ID == this.ID).FirstOrDefaultAsync();
+            
             if (user is not null)
             {
+                User = user;
+                _Account = User.Accounts;
                 Models.Account account = new(0, 0, user.Username, "Investing", user.ID, user);
+                User.Accounts.Add(account);
+                _Account.Add(account);
                 _context.Accounts.Add(account);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
-            var url = Url.Page("/Account/Home");
-
-            return Redirect(url + $"?Id={id}");
-
+           
+            return RedirectToPage("/Account/Home");
         }
+
+
 
 
         //all users start out with a default "Checking" account
 
-        public async Task<IActionResult> OnGetAsync(int ID)
+        //I use the session variable to get the UserID
+        //I asynchronously get that user from the db
+        //I then get the Accounts owned by that user
+        //I then assign the user property for this model
+        //I then check to see which "State" the model is in,
+        //if the users account list is empty, then add a default checking account
+            //to the database, and the user
+        //if user account list is null, then initialize it, and assign the accounts
+            //that I got from the database to the user accounts, and the account property
+            //of this model
+        //and if we pass all of that, then i simply assign the user account
+            //list to be the accounts I got from the database
+            //and assign the account property of this model to be the
+            //user account list
+        //I also toggle the "hidden" property to determine whether I should allow
+            //the user to add a new account or not (Max 3 accounts) (for now..)
+        //and finally if we fail the first check (if user is not null)
+            //we arent logged in, so I redirect the user to the login page
+        public async Task<IActionResult> OnGetAsync()
         {
-            var user = _context.Users.Where(x=>x.ID == ID).FirstOrDefaultAsync().Result;
+            if (HttpContext.Session.Get("ID") != null)
+            {
+                this.ID = (int)HttpContext.Session.GetInt32("ID");
+            }
+            var user = await _context.Users.Where(x=>x.ID == this.ID).FirstOrDefaultAsync();
+
             if (user is not null)
             {
                 User = user;
-                var accounts = _context.Accounts.Where(x=>x.LoginID == User.ID).ToList();
+                var accounts = await _context.Accounts.Where(x=>x.LoginID == User.ID).ToListAsync();
                 if (accounts is null || accounts.Count == 0)
                 {
                     
                     User.Accounts = new List<Models.Account>();
                     _Account = User.Accounts;
-                    Models.Account act = new Models.Account(0, 0, User.Username, "Checking", User.ID, User);
+                    Models.Account act = new(0, 0, User.Username, "Checking", this.ID, User);
                     _Account.Add(act);
                     _context.Accounts.Add(act);
                     await _context.SaveChangesAsync();
@@ -80,6 +125,12 @@ namespace BankingApp.Pages.Account
                 {
                     User.Accounts = accounts;
                     _Account = User.Accounts;
+                }
+                this.hidden = "block";
+
+                if (_Account.Count > 2)
+                {
+                    this.hidden = "none";
                 }
                 return Page();
             }

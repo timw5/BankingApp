@@ -4,6 +4,8 @@ using BankingApp.Data;
 using BankingApp.Models;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+
 
 namespace BankingApp.Pages.Account
 {
@@ -95,12 +97,12 @@ namespace BankingApp.Pages.Account
         //are null ( Helper method IsInvalid() ), It is done Asynchronously,
         //it returns a promise of IActionResult(to do an action) once the login information
         //is stored in the database. We then redirect to the Account Page
-        //******Currently I'm redirecting to Index because I don't have the Account page set up yet.
 
         // create a new Login object, pass in the username, and password
         // _db.Add(Login) Stages a new entry to be added to the Login table,
         // based on the information saved in the Login object
         // _dv.SaveChangesAsync(); Updates the database with any staged entries asynchronously
+        //I set the session variable "ID" to hold the UserID to be used on the account page
         public async Task<IActionResult> OnPostAsync()
         {
             if (this.IsInvalid())
@@ -111,8 +113,11 @@ namespace BankingApp.Pages.Account
             Models.Account account = new(0, 0, Username, "Checking", Login.ID, Login);
             _db.Accounts.Add(account);
             await _db.SaveChangesAsync();
-            
-            return RedirectToPage("/Account/Home", new { ID = Login.ID });
+
+            if(HttpContext.Session.Get("ID") != null)            
+                HttpContext.Session.SetInt32("ID", Login.ID);
+       
+            return RedirectToPage("/Account/Home");
 
         }
 
