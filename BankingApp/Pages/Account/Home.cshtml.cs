@@ -16,7 +16,7 @@ namespace BankingApp.Pages.Account
     public class AccountModel : PageModel
     {
         //database context variable
-        private readonly BankingAppContext _context;
+        private readonly BankingAppContext _db;
 
 
         //list of accounts attached to the current user
@@ -41,7 +41,7 @@ namespace BankingApp.Pages.Account
         //constructor for this model
         public AccountModel(BankingApp.Data.BankingAppContext context)
         {
-            _context = context;
+            _db = context;
         }
 
  
@@ -54,7 +54,7 @@ namespace BankingApp.Pages.Account
             {
                 this.ID = (int)HttpContext.Session.GetInt32("ID");
             }
-            var user = await _context.Users.Where(x => x.ID == this.ID).FirstOrDefaultAsync();
+            var user = await _db.Users.Where(x => x.ID == this.ID).FirstOrDefaultAsync();
             
             if (user is not null)
             {
@@ -63,12 +63,13 @@ namespace BankingApp.Pages.Account
                 Models.Account account = new(0, 0, user.Username, "Investing", user.ID, user);
                 User.Accounts.Add(account);
                 _Account.Add(account);
-                _context.Accounts.Add(account);
-                await _context.SaveChangesAsync();
+                _db.Accounts.Add(account);
+                await _db.SaveChangesAsync();
             }
            
             return RedirectToPage("/Account/Home");
         }
+        
 
 
 
@@ -99,12 +100,13 @@ namespace BankingApp.Pages.Account
             {
                 this.ID = (int)HttpContext.Session.GetInt32("ID");
             }
-            var user = await _context.Users.Where(x=>x.ID == this.ID).FirstOrDefaultAsync();
+
+            var user = await _db.Users.Where(x=>x.ID == this.ID).FirstOrDefaultAsync();
 
             if (user is not null)
             {
                 User = user;
-                var accounts = await _context.Accounts.Where(x=>x.LoginID == User.ID).ToListAsync();
+                var accounts = await _db.Accounts.Where(x=>x.LoginID == User.ID).ToListAsync();
                 if (accounts is null || accounts.Count == 0)
                 {
                     
@@ -112,8 +114,8 @@ namespace BankingApp.Pages.Account
                     _Account = User.Accounts;
                     Models.Account act = new(0, 0, User.Username, "Checking", this.ID, User);
                     _Account.Add(act);
-                    _context.Accounts.Add(act);
-                    await _context.SaveChangesAsync();
+                    _db.Accounts.Add(act);
+                    await _db.SaveChangesAsync();
                 }
                 else if(User.Accounts is null)
                 {
@@ -126,7 +128,7 @@ namespace BankingApp.Pages.Account
                     User.Accounts = accounts;
                     _Account = User.Accounts;
                 }
-                this.hidden = "block";
+                this.hidden = "inline-block";
 
                 if (_Account.Count > 2)
                 {
@@ -136,5 +138,26 @@ namespace BankingApp.Pages.Account
             }
             return RedirectToPage("/Account/Login");
         }
+
+
+
+
+        public async Task<JsonResult> OnGetTransactions()
+        {
+            if (HttpContext.Session.Get("ID") != null)
+            {
+                this.ID = (int)HttpContext.Session.GetInt32("ID");
+            }
+
+            JsonResult res = new JsonResult("Hello world");
+
+            return res;
+
+
+
+
+
+        }
+
     }
 }

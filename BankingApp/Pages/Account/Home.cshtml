@@ -24,7 +24,7 @@
                 @foreach (var item in Model._Account)
 
                 {
-                    <div class="col-md-3 m-4 p-4 border rounded-2 shadow-lg linkto mx-auto" :hover onclick="location.href=#" style="cursor: pointer" title="View Transactions">
+                    <div class="col-md-3 m-4 p-4 border rounded-2 shadow-lg linkto mx-auto" :hover Onclick="GetTransactions" style="cursor: pointer" title="View Transactions" id="field1" >
                         <div class="h3 fw-bold mb-2  text-center">@item.Type</div>
                         <hr/>
                             
@@ -42,12 +42,41 @@
 
             </div>
                     <div class="container w-100 text-center">
-            <a class="btn btn-primary mt-4 hidden"  type="button" id="AddAccount"  asp-page="/Account/Home" asp-page-handler="AddNewAccount" > Add new Account</a>
+            <a class= "btn btn-primary m-4 hidden"  type="button" id="AddAccount"  asp-page="/Account/Home" asp-page-handler="AddNewAccount" > Add new Account</a>
             <a href="#" class="btn btn-primary m-4" type="button"  id="TransferFunds">Transfer Funds </a>
+                    </div>
         </div>
-        </div>
+    </div>
+
+    <div class="container" id="DataField">
+
+
 
     </div>
+@section scripts{
+
+    <script type="text/javascript">
+        //const x = document.querySelector()
+        //dummy function...
+document.getElementById("field1").addEventListener("click", GetTransactions);
+        function GetTransactions() {
+            //ajax call to get transactions...
+            var x;
+            $.ajax({
+                url: "/Account/Home?handler=Transactions",
+                type: 'GET',
+                success: function(data) {
+                    x = JSON.stringify(data);
+                },
+                error: function(error) {
+                    console.log(`Error ${error}`);
+                }
+            });  
+
+            document.getElementById("DataField").innerHTML = x;
+        }
+    </script>
+}
 
 
 

@@ -1,0 +1,55 @@
+﻿@page
+@model BankingApp.Pages.Account.TransactionsModel
+
+@{
+    ViewData["Title"] = "Transactions";
+}
+
+<h1>Transactions</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Transfers[0].Dollars)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Transfers[0].Cents)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Transfers[0].Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Transfers[0].Time)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Transfers) {
+        <tr>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.Dollars)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cents)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Type)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Time)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

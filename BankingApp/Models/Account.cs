@@ -44,9 +44,11 @@ namespace BankingApp.Models
         [Required]
         public Login Login { get; set; }//User (Login class) that owns this account
 
+        [InverseProperty("WithdrawAccount")]
+        public ICollection<Transfers> Withdrawals { get; set; }//list of transfers that withdrew money (from)
 
-
-
+        [InverseProperty("DepositAccount")]
+        public ICollection<Transfers> Deposits { get; set; }//list of transfers that deposited money (To)
 
 
         public string BalanceToString()//print current balance
