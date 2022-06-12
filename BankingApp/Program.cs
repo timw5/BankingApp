@@ -10,6 +10,8 @@ builder.Services.AddRazorPages();
 
 //add memory cache to enable session storage
 builder.Services.AddMemoryCache();
+builder.Services.AddMvc(); 
+            
 
 ////***The code below is to configure the cookie policy for the website
 
@@ -30,6 +32,13 @@ builder.Services.AddSession(options => {
 builder.Services.AddDbContext<BankingAppContext>(options =>{
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
+
+builder.Services.AddAntiforgery(options =>
+{
+options.HeaderName = "XSRF-TOKEN";
+}
+
+    );
 
 
 var app = builder.Build();

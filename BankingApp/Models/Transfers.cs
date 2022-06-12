@@ -10,8 +10,8 @@ namespace BankingApp.Models
         
         public Transfers(int fromID, int toID, int dollars, int cents, string type, Account deposit, Account Withdrawal)
         {
-            WithdrawID = fromID;
-            DepositID = toID;
+            WithdrawAccountID = fromID;
+            DepositAccountID = toID;
             Dollars = dollars;
             Cents = cents;
             Type = type;
@@ -23,8 +23,8 @@ namespace BankingApp.Models
 
         public Transfers(int fromID, int toID, int dollars, int cents, string type)
         {
-            WithdrawID = fromID;
-            DepositID = toID;
+            WithdrawAccountID = fromID;
+            DepositAccountID = toID;
             Dollars = dollars;
             Cents = cents;
             Type = type;
@@ -37,16 +37,15 @@ namespace BankingApp.Models
         public int Id { get; set; }//primary key
 
         
-        [ForeignKey(nameof(Account.Withdrawals)), Column(Order = 0)]
-        //[ForeignKey("Withdrawals")]
-        public int WithdrawID { get; set; }//FK reference to which account the money is coming from
+        [ForeignKey("Account"), Column(Order = 0)]
+        public int WithdrawAccountID { get; set; }//FK reference to which account the money is coming from
 
 
         public Account WithdrawAccount { get; set; }//which account the money is coming from
 
-        [ForeignKey(nameof(Account.Deposits)), Column(Order = 1)]
-        [Required]
-        public int DepositID { get; set; }//FK reference to which account the money is being deposited into
+
+        [ForeignKey("Account"), Column(Order = 1)]
+        public int DepositAccountID { get; set; }//FK reference to which account the money is being deposited into
 
         public Account DepositAccount { get; set; }//which account the money is being deposited into
 

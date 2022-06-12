@@ -14,6 +14,8 @@ namespace BankingApp.Models
             Type = type;
             LoginID = loginID;
             Login = usr;
+            Withdrawals = new List<Transfers>();
+            Deposits = new List<Transfers>();
         }
         public Account()//default constructor
         {
@@ -23,7 +25,11 @@ namespace BankingApp.Models
             Type = "Checking";
             LoginID = 0;
             Login = default!;
-        }        
+            Withdrawals = new List<Transfers>();
+            Deposits = new List<Transfers>();
+        }   
+        
+        
         public int ID { get; set; }//primary key
         
         [Required]

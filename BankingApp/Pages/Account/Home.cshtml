@@ -1,8 +1,12 @@
 ﻿@page
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @model BankingApp.Pages.Account.AccountModel
 
 @{
     ViewData["Title"] = "Account";
+    
+    
+
 
 }
 <style>
@@ -19,12 +23,14 @@
 
     <div class="container shadow-lg border rounded-3">
         <div class="container mx-auto mt-2 w-100">
-            <h1 class="text-center my-4">Welcome @Model.User.Username</h1>
+            <h1 class="text-center my-4">Welcome @Model._User.Username</h1>
             <div class="row container mx-auto w-100 ">
+                
                 @foreach (var item in Model._Account)
 
                 {
-                    <div class="col-md-3 m-4 p-4 border rounded-2 shadow-lg linkto mx-auto" :hover Onclick="GetTransactions" style="cursor: pointer" title="View Transactions" id="field1" >
+                    
+                    <div class="col-md-3 m-4 p-4 border rounded-2 shadow-lg linkto mx-auto" :hover Onclick="GetTransactions(@item.Type.ToString())" style="cursor: pointer" title="View Transactions" id="@item.ID" >
                         <div class="h3 fw-bold mb-2  text-center">@item.Type</div>
                         <hr/>
                             
@@ -42,41 +48,104 @@
 
             </div>
                     <div class="container w-100 text-center">
-            <a class= "btn btn-primary m-4 hidden"  type="button" id="AddAccount"  asp-page="/Account/Home" asp-page-handler="AddNewAccount" > Add new Account</a>
+            <button class= "btn btn-primary m-4 hidden" id="newacnt"   @*asp-page="/Account/Home" asp-page-handler="AddNewAccount"*@ > Add new Account</button>
+                    @Html.AntiForgeryToken()
+
             <a href="#" class="btn btn-primary m-4" type="button"  id="TransferFunds">Transfer Funds </a>
                     </div>
         </div>
     </div>
-
     <div class="container" id="DataField">
-
-
-
     </div>
+
 @section scripts{
 
-    <script type="text/javascript">
+<script src="~/lib/limonte-sweetalert2/sweetalert2.all.js"></script>
+
+    <script type="text/javascript" >
+        //document.querySelector('#newacnt').addEventListener("Click", AddNewAccount)
+        //$("#newacnt").click(AddNewAccount);
+        //console.log("under event binder");
         //const x = document.querySelector()
         //dummy function...
-document.getElementById("field1").addEventListener("click", GetTransactions);
-        function GetTransactions() {
-            //ajax call to get transactions...
-            var x;
-            $.ajax({
-                url: "/Account/Home?handler=Transactions",
-                type: 'GET',
-                success: function(data) {
-                    x = JSON.stringify(data);
-                },
-                error: function(error) {
-                    console.log(`Error ${error}`);
-                }
-            });  
+        //document.getElementById("field1").addEventListener("click", GetTransactions);
+$("#newacnt").click(function() {
+    //function AddNewAccount() {
+    console.log("in newaccount function");
+    (async () => {
 
-            document.getElementById("DataField").innerHTML = x;
+        const inputOptions = new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({
+                    'Savings': 'Savings',
+                    'Investment': 'Investment',
+                    'Checking': 'Checking'
+                })
+            }, 1000)
+        })
+
+        const { value: acntType } = await Swal.fire
+            ({
+                title: "Which type of account?",
+                input: "radio",
+                showCancelButton: true,
+                showConfirmButton: true,
+                inputOptions: inputOptions,
+                inputValidator: (value) => {
+                    if (!value) {
+                        return "You must select an account";
+                    }
+                }
+            })
+            //.then((result) => 
+            //{
+            //    return result;
+            //})
+
+        if (acntType) {
+            const URL = './Home?handler=AddNewAccount';
+            $.ajax
+                ({
+                    type: 'POST',
+                    url: URL,
+                    async: true,
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                    data:
+                        JSON.stringify(acntType),
+                    success: function(data) {
+
+                        location.reload();
+
+                    },
+                    error: function(error) {
+                        console.log(`Error ${error}`);
+                    }
+                }).then(
+
+                    Swal.fire
+                        (
+                            'Account Created Succesfully',
+                            '',
+                            'success',
+
+                    ).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload();
+                        }
+                    }
+                            
+                    )
+                )
         }
+    })();
+});
     </script>
 }
+
 
 
 

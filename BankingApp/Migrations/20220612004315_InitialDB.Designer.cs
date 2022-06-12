@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BankingApp.Migrations
 {
     [DbContext(typeof(BankingAppContext))]
-    [Migration("20220611052626_fks")]
-    partial class fks
+    [Migration("20220612004315_InitialDB")]
+    partial class InitialDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -92,11 +92,9 @@ namespace BankingApp.Migrations
                     b.Property<int>("Cents")
                         .HasColumnType("int");
 
-                    b.Property<int>("DepositID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Deposits")
-                        .HasColumnType("int");
+                    b.Property<int>("DepositAccountID")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
 
                     b.Property<int>("Dollars")
                         .HasColumnType("int");
@@ -109,15 +107,12 @@ namespace BankingApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("WithdrawAccountID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WithdrawID")
                         .HasColumnType("int")
                         .HasColumnOrder(0);
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Deposits");
+                    b.HasIndex("DepositAccountID");
 
                     b.HasIndex("WithdrawAccountID");
 
@@ -139,7 +134,7 @@ namespace BankingApp.Migrations
                 {
                     b.HasOne("BankingApp.Models.Account", "DepositAccount")
                         .WithMany("Deposits")
-                        .HasForeignKey("Deposits")
+                        .HasForeignKey("DepositAccountID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

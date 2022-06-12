@@ -47,6 +47,9 @@ namespace BankingApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
                     b.HasKey("ID");
 
                     b.HasIndex("LoginID");
@@ -90,11 +93,9 @@ namespace BankingApp.Migrations
                     b.Property<int>("Cents")
                         .HasColumnType("int");
 
-                    b.Property<int>("DepositID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Deposits")
-                        .HasColumnType("int");
+                    b.Property<int>("DepositAccountID")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
 
                     b.Property<int>("Dollars")
                         .HasColumnType("int");
@@ -107,15 +108,12 @@ namespace BankingApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("WithdrawAccountID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WithdrawID")
                         .HasColumnType("int")
                         .HasColumnOrder(0);
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Deposits");
+                    b.HasIndex("DepositAccountID");
 
                     b.HasIndex("WithdrawAccountID");
 
@@ -137,7 +135,7 @@ namespace BankingApp.Migrations
                 {
                     b.HasOne("BankingApp.Models.Account", "DepositAccount")
                         .WithMany("Deposits")
-                        .HasForeignKey("Deposits")
+                        .HasForeignKey("DepositAccountID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
