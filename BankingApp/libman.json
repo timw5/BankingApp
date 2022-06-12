@@ -1,4 +1,3 @@
-//This folder manages our Client-side Libraries
 {
   "version": "1.0",
   "defaultProvider": "cdnjs",
@@ -6,6 +5,10 @@
     {
       "library": "datatables@1.10.21",
       "destination": "wwwroot/lib/datatables/"
+    },
+    {
+      "library": "limonte-sweetalert2@11.4.17",
+      "destination": "wwwroot/lib/limonte-sweetalert2/"
     }
   ]
 }

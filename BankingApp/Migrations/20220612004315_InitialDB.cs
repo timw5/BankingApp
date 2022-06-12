@@ -10,24 +10,6 @@ namespace BankingApp.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Transfers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FromID = table.Column<int>(type: "int", nullable: false),
-                    ToID = table.Column<int>(type: "int", nullable: false),
-                    Dollars = table.Column<int>(type: "int", nullable: false),
-                    Cents = table.Column<int>(type: "int", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Time = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Transfers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -62,22 +44,62 @@ namespace BankingApp.Migrations
                         column: x => x.LoginID,
                         principalTable: "Users",
                         principalColumn: "ID",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Transfers",
+                columns: table => new
+                {
+                    WithdrawAccountID = table.Column<int>(type: "int", nullable: false),
+                    DepositAccountID = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Dollars = table.Column<int>(type: "int", nullable: false),
+                    Cents = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Time = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transfers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Transfers_Accounts_DepositAccountID",
+                        column: x => x.DepositAccountID,
+                        principalTable: "Accounts",
+                        principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Transfers_Accounts_WithdrawAccountID",
+                        column: x => x.WithdrawAccountID,
+                        principalTable: "Accounts",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Accounts_LoginID",
                 table: "Accounts",
                 column: "LoginID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transfers_DepositAccountID",
+                table: "Transfers",
+                column: "DepositAccountID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transfers_WithdrawAccountID",
+                table: "Transfers",
+                column: "WithdrawAccountID");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Accounts");
+                name: "Transfers");
 
             migrationBuilder.DropTable(
-                name: "Transfers");
+                name: "Accounts");
 
             migrationBuilder.DropTable(
                 name: "Users");

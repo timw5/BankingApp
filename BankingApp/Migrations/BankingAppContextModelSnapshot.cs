@@ -47,6 +47,9 @@ namespace BankingApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
                     b.HasKey("ID");
 
                     b.HasIndex("LoginID");
@@ -90,23 +93,29 @@ namespace BankingApp.Migrations
                     b.Property<int>("Cents")
                         .HasColumnType("int");
 
-                    b.Property<int>("Dollars")
-                        .HasColumnType("int");
+                    b.Property<int>("DepositAccountID")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
 
-                    b.Property<int>("FromID")
+                    b.Property<int>("Dollars")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ToID")
-                        .HasColumnType("int");
-
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("WithdrawAccountID")
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
                     b.HasKey("Id");
+
+                    b.HasIndex("DepositAccountID");
+
+                    b.HasIndex("WithdrawAccountID");
 
                     b.ToTable("Transfers");
                 });
@@ -120,6 +129,32 @@ namespace BankingApp.Migrations
                         .IsRequired();
 
                     b.Navigation("Login");
+                });
+
+            modelBuilder.Entity("BankingApp.Models.Transfers", b =>
+                {
+                    b.HasOne("BankingApp.Models.Account", "DepositAccount")
+                        .WithMany("Deposits")
+                        .HasForeignKey("DepositAccountID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BankingApp.Models.Account", "WithdrawAccount")
+                        .WithMany("Withdrawals")
+                        .HasForeignKey("WithdrawAccountID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DepositAccount");
+
+                    b.Navigation("WithdrawAccount");
+                });
+
+            modelBuilder.Entity("BankingApp.Models.Account", b =>
+                {
+                    b.Navigation("Deposits");
+
+                    b.Navigation("Withdrawals");
                 });
 
             modelBuilder.Entity("BankingApp.Models.Login", b =>

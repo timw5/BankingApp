@@ -15,6 +15,8 @@ namespace BankingApp.Models
             Type = type;
             LoginID = loginID;
             Login = usr;
+            Withdrawals = new List<Transfers>();
+            Deposits = new List<Transfers>();
         }
         public Account()//default constructor
         {
@@ -24,9 +26,11 @@ namespace BankingApp.Models
             Type = "Checking";
             LoginID = 0;
             Login = default!;
-        }
-
-        [Key]
+            Withdrawals = new List<Transfers>();
+            Deposits = new List<Transfers>();
+        }   
+        
+        
         public int ID { get; set; }//primary key
         
         [Required]
@@ -48,13 +52,11 @@ namespace BankingApp.Models
         [Required]
         public Login Login { get; set; }//User (Login class) that owns this account
 
+        [InverseProperty("WithdrawAccount")]
+        public ICollection<Transfers> Withdrawals { get; set; }//list of transfers that withdrew money (from)
 
-        //[Required]
-        //public ICollection<Transfers> Transfers { get; set; }
-
-
-
-
+        [InverseProperty("DepositAccount")]
+        public ICollection<Transfers> Deposits { get; set; }//list of transfers that deposited money (To)
 
 
         public string BalanceToString()//print current balance

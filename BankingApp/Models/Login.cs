@@ -22,7 +22,13 @@ namespace BankingApp.Models
             Accounts = new List<Account>();
         }
 
-
+        public Login()
+        {
+            Username = String.Empty;
+            Hash = String.Empty;
+            Salt = String.Empty;
+            Accounts = new List<Account>();
+        }
         public int ID { get; set; }//primary key
 
         [Required]

@@ -9,23 +9,28 @@ using BankingApp.Data;
 using BankingApp.Models;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
+using System.Web;
 
 
 namespace BankingApp.Pages.Account
 {
+    //[ValidateAntiForgeryToken]
+
     public class AccountModel : PageModel
     {
         //database context variable
-        private readonly BankingAppContext _context;
+        private readonly BankingAppContext _db;
 
+        [BindProperty]
+        public int count { get; set; } = 0;
 
         //list of accounts attached to the current user
         [BindProperty, Required]
         public ICollection<Models.Account> _Account { get; set; } = default!;
 
         //user currently logged in
-        [BindProperty, Required]
-        public Login User { get; set; }
+        [BindProperty]
+        public Login _User { get; set; }
 
         [BindProperty]
         public int ID { get; set; }
@@ -41,34 +46,38 @@ namespace BankingApp.Pages.Account
         //constructor for this model
         public AccountModel(BankingApp.Data.BankingAppContext context)
         {
-            _context = context;
+            _User = default!;
+            _db = context;
         }
 
- 
+
         //This is the handler for the Add New Account button,
         //I use the Session Variable "ID" to get the user
         //that owns this account
-        public async Task<IActionResult> OnGetAddNewAccount()
+        public IActionResult OnPostAddNewAccountAsync([FromBody]string? acntType)
         {
             if (HttpContext.Session.Get("ID") != null)
             {
                 this.ID = (int)HttpContext.Session.GetInt32("ID");
             }
-            var user = await _context.Users.Where(x => x.ID == this.ID).FirstOrDefaultAsync();
+            var user = _db.Users.Where(x => x.ID == this.ID).FirstOrDefaultAsync().Result;
             
-            if (user is not null)
+            if (user is not null && acntType is not null)
             {
-                User = user;
-                _Account = User.Accounts;
-                Models.Account account = new(0, 0, user.Username, "Investing", user.ID, user);
-                User.Accounts.Add(account);
+                _User = user;
+                _Account = _User.Accounts;
+                Models.Account account = new(0, 0, user.Username, acntType, user.ID, user);
+                _User.Accounts.Add(account);
                 _Account.Add(account);
-                _context.Accounts.Add(account);
-                await _context.SaveChangesAsync();
+                _db.Accounts.Add(account);
+                _db.SaveChangesAsync().Wait();
             }
            
-            return RedirectToPage("/Account/Home");
+            
+            
+            return Page();
         }
+        
 
 
 
@@ -99,34 +108,35 @@ namespace BankingApp.Pages.Account
             {
                 this.ID = (int)HttpContext.Session.GetInt32("ID");
             }
-            var user = await _context.Users.Where(x=>x.ID == this.ID).FirstOrDefaultAsync();
+
+            var user = await _db.Users.Where(x=>x.ID == this.ID).FirstOrDefaultAsync();
 
             if (user is not null)
             {
-                User = user;
-                var accounts = await _context.Accounts.Where(x=>x.LoginID == User.ID).ToListAsync();
+                _User = user;
+                var accounts = await _db.Accounts.Where(x=>x.LoginID == _User.ID).ToListAsync();
                 if (accounts is null || accounts.Count == 0)
                 {
                     
-                    User.Accounts = new List<Models.Account>();
-                    _Account = User.Accounts;
-                    Models.Account act = new(0, 0, User.Username, "Checking", this.ID, User);
+                    _User.Accounts = new List<Models.Account>();
+                    _Account = _User.Accounts;
+                    Models.Account act = new(0, 0, _User.Username, "Checking", this.ID, _User);
                     _Account.Add(act);
-                    _context.Accounts.Add(act);
-                    await _context.SaveChangesAsync();
+                    _db.Accounts.Add(act);
+                    await _db.SaveChangesAsync();
                 }
-                else if(User.Accounts is null)
+                else if(_User.Accounts is null)
                 {
-                    User.Accounts = new List<Models.Account>();
-                    User.Accounts = accounts;
+                    _User.Accounts = new List<Models.Account>();
+                    _User.Accounts = accounts;
                     _Account = accounts;
                 }
                 else
                 {
-                    User.Accounts = accounts;
-                    _Account = User.Accounts;
+                    _User.Accounts = accounts;
+                    _Account = _User.Accounts;
                 }
-                this.hidden = "block";
+                this.hidden = "inline-block";
 
                 if (_Account.Count > 2)
                 {
@@ -136,5 +146,29 @@ namespace BankingApp.Pages.Account
             }
             return RedirectToPage("/Account/Login");
         }
+
+
+
+        
+        public JsonResult OnGetTransactions(string type)
+        {
+            JsonResult js = new JsonResult("Hello World");
+            var x = Request.Query["val"];
+            JsonContent jc;
+            js.Value = x;
+            js.ContentType = "application/json";
+            js.StatusCode = 200;
+            
+            
+
+
+            return js;
+
+
+
+
+
+        }
+
     }
 }
