@@ -54,7 +54,10 @@ namespace BankingApp.Pages.Account
         //This is the handler for the Add New Account button,
         //I use the Session Variable "ID" to get the user
         //that owns this account
-        public IActionResult OnPostAddNewAccountAsync([FromBody]string? acntType)
+        //I query the database for the user information
+        //I then add a new account with the name provided from the javascript ajax POST call
+        //that value is received to this method as "acntType"
+        public IActionResult OnPostAddNewAccountAsync([FromBody]string? acntType)//[FromBody] attribute specifies the value is coming from a POST request
         {
             if (HttpContext.Session.Get("ID") != null)
             {
@@ -149,7 +152,8 @@ namespace BankingApp.Pages.Account
 
 
 
-        
+        //this method is not used currently, but will be later
+        //so ignore the code in it for now, it will change
         public JsonResult OnGetTransactions(string type)
         {
             JsonResult js = new JsonResult("Hello World");

@@ -4,83 +4,55 @@
 
 @{
     ViewData["Title"] = "Account";
-    
-    
-
-
 }
 <style>
     .linkto:active, .linkto:hover{
-
-        /*border :solid!important;
-        border-color : dodgerblue!important; */
-        /*font-size-adjust: 2!important;*/
-       /* text-emphasis-style:open!important;
-        text-emphasis-color:dodgerBlue!important;
-        text-emphasis-position:right!important*/
-
         -webkit-text-stroke:thin!important;
         -webkit-text-stroke-color:cornflowerblue!important;
-/*        font-size:1.66rem!important;
-*/        -webkit-text-size-adjust:!important;
-/*          -webkit-user-select:auto!important;
-*//*        padding-right: 3rem!important; 
-*/
-        
-        
+        -webkit-text-size-adjust:!important;
     }
-
-
     .hidden {
         display: @Model.hidden!important;
     }
 </style>
 
-
-
     <div class="container shadow-lg border rounded-3">
         <div class="container mx-auto mt-2 w-100">
             <h1 class="text-center my-4">Welcome @Model._User.Username</h1>
             <div class="row container mx-auto w-100 ">
-                
                 @foreach (var item in Model._Account)
-
                 {
-                    
-                    <div class="col-md-3 m-4 p-4 border rounded-2 shadow-lg linkto mx-auto" :hover Onclick="GetTransactions(@item.Type.ToString())" style="cursor: pointer" title="View Transactions" id="@item.ID" >
-                        <div class="h3 fw-bold mb-2  text-center">@item.Type</div>
-                        <hr/>
-                            
+                    <div class="col-md-3 m-4 p-4 border rounded-2 shadow-lg mx-auto"  title="View Transactions" id="@item.ID" >
+                        <div class="h3 fw-bold mb-2  linkto  text-center" :hover Onclick="GetTransactions" style="cursor: pointer" >@item.Type  </div>
+                            <hr/>
                             <div class="col-sm-2 w-100 fw-bold text-center">
                                 Balance:
                             </div>
                             <div class="col-sm-2 w-100 text-center">
                                 @item.BalanceToString()
                             </div>
-                    <div class="col-sm-2 w-100 text-center">
-                        <button class="btn btn-success mt-4 mx-auto justify-content-center" id="#AddFunds" type="button">Add Funds</button> @*add funds button*@
+                        <div class="col-sm-2 w-100 text-center">
+                            <button class="btn btn-success mt-4 mx-auto justify-content-center" id="#AddFunds" type="button">Add Funds</button> @*add funds button*@
+                        </div>
                     </div>
-                    </div>
-                }
-
+                }@*End Foreach*@
             </div>
-                    <div class="container w-100 text-center">
-            <button class= "btn btn-primary m-4 hidden" id="newacnt"   @*asp-page="/Account/Home" asp-page-handler="AddNewAccount"*@ > Add new Account</button>
-                    @Html.AntiForgeryToken()
+            <div class="container w-100 text-center">
+                <button class= "btn btn-primary m-4 hidden" id="newacnt"   @*asp-page="/Account/Home" asp-page-handler="AddNewAccount"*@ > Add new Account</button>
+                @Html.AntiForgeryToken() @*Added anti-forgery token for ajax call*@
 
-            <a href="#" class="btn btn-primary m-4" type="button"  id="TransferFunds">Transfer Funds </a>
-                    </div>
+                <a href="#" class="btn btn-primary m-4" type="button"  id="TransferFunds">Transfer Funds </a>
+            </div>
         </div>
     </div>
-    <div class="container" id="DataField">
-    </div>
 
-@section scripts{
-
-<script src="~/lib/limonte-sweetalert2/sweetalert2.all.js"></script>
-
+@section scripts
+{
+    <script src="~/lib/limonte-sweetalert2/sweetalert2.all.js"></script>
     <script type="text/javascript">
-        
+        //Below is the method to add a new account
+        //We use AJAX, and an asynchronous POST request to send the selected option from sweet alert
+        //We then use the OnPostAddNewAccount method that can be found in our Home.cshtml.cs page
         $("#newacnt").click(() => 
         {
             console.log("in newaccount function");
@@ -161,7 +133,7 @@
                         {
                             if (result.isConfirmed) 
                             {
-                                window.location.reload();
+                                window.location.reload();//reload to get database changes to the page
 
                             }//end if(result.isConfirmed)
 
@@ -175,8 +147,9 @@
 
         });//end function
 
-    </script>
-}
+    </script> @*End Script*@
+
+}@*End Section Script*@
 
 
 
