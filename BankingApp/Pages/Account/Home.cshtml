@@ -8,8 +8,25 @@
 <style>
     .linkto:active, .linkto:hover{
 
-        border-color : dodgerblue!important; 
+        /*border :solid!important;
+        border-color : dodgerblue!important; */
+        /*font-size-adjust: 2!important;*/
+       /* text-emphasis-style:open!important;
+        text-emphasis-color:dodgerBlue!important;
+        text-emphasis-position:right!important*/
+
+        -webkit-text-stroke:thin!important;
+        -webkit-text-stroke-color:cornflowerblue!important;
+/*        font-size:1.66rem!important;
+*/        -webkit-text-size-adjust:!important;
+/*          -webkit-user-select:auto!important;
+*//*        padding-right: 3rem!important; 
+*/
+        
+        
     }
+
+
     .hidden {
         display: @Model.hidden!important;
     }
@@ -24,8 +41,8 @@
                 @foreach (var item in Model._Account)
 
                 {
-                    <div class="col-md-3 m-4 p-4 border rounded-2 shadow-lg linkto mx-auto" :hover onclick="location.href=#" style="cursor: pointer" title="View Transactions">
-                        <div class="h3 fw-bold mb-2  text-center">@item.Type</div>
+                    <div class="col-md-3 m-4 p-4 border rounded-2 shadow-lg mx-auto" >
+                        <div class="h3 fw-bold mb-2  text-center  linkto onclick="location.href="#" :hover style="cursor: pointer" title="View Transactions">@item.Type</div>
                         <hr/>
                             
                             <div class="col-sm-2 w-100 fw-bold text-center">
@@ -35,7 +52,7 @@
                                 @item.BalanceToString()
                             </div>
                     <div class="col-sm-2 w-100 text-center">
-                        <button class="btn btn-success mt-4 mx-auto justify-content-center" id="#AddFunds" type="button">Add Funds</button>
+                        <button class="btn btn-success mt-4 mx-auto justify-content-center" id="#AddFunds" type="button">Add Funds</button> @*add funds button*@
                     </div>
                     </div>
                 }

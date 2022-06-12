@@ -129,6 +129,7 @@ namespace BankingApp.Pages.Account
         //Promise (Task) of a JsonResult object,
         //which just ensures that javascript is getting
         //The correct Data type (bool)
+        //make this asynchronous
         public JsonResult OnPostCheckUsername()
         {
 

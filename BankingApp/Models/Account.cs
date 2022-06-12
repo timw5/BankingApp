@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BankingApp.Models
@@ -23,7 +24,9 @@ namespace BankingApp.Models
             Type = "Checking";
             LoginID = 0;
             Login = default!;
-        }        
+        }
+
+        [Key]
         public int ID { get; set; }//primary key
         
         [Required]
@@ -39,10 +42,15 @@ namespace BankingApp.Models
         public string Type { get; set; }//type of account (savings, investment, checking, etc..)
 
         [Required]
+        [ForeignKey("Login")]
         public int LoginID { get; set; }//foreign key to Users table (Login class)
 
         [Required]
         public Login Login { get; set; }//User (Login class) that owns this account
+
+
+        //[Required]
+        //public ICollection<Transfers> Transfers { get; set; }
 
 
 

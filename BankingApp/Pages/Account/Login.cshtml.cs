@@ -27,8 +27,6 @@ namespace BankingApp.Pages.Account
         //html we are sending to the server, these are very easily injectable by using @propname
         
 
-
-
         [BindProperty]
         [Required(ErrorMessage = "Username is Required")]
         public string Username { get; set; }
@@ -46,11 +44,10 @@ namespace BankingApp.Pages.Account
         //When this page is requested, we render the page
         public IActionResult OnGet()
         {
-            HttpContext.Session.Clear();
+            //HttpContext.Session.Clear();
 
             return Page();
         }
-
 
 
         //This method checks if the current login is valid, we see if the username provide has a match in the DB,
@@ -89,9 +86,12 @@ namespace BankingApp.Pages.Account
 
         public IActionResult OnGetClearSession()
         {
+
             HttpContext.Session.Remove("ID");
+            HttpContext.Session.Clear();
+
             return Page();
-        }
+        }   
 
         //When we hit submit on our form, we first check to make sure the string's aren't empty,
         //then we pass the username and password provided to the function described above
@@ -100,7 +100,10 @@ namespace BankingApp.Pages.Account
         //***I currently have it set to /Index because I havent made the Account page yet.
         public async Task<IActionResult> OnPost()
         {
-            HttpContext.Session.Clear();
+            if(HttpContext.Session.Get("ID") != null)//checks if I'm already logged in
+            {
+                RedirectToPage("/Account/Home");
+            }
 
             if (Password == String.Empty || Username == String.Empty)
             {
@@ -116,7 +119,7 @@ namespace BankingApp.Pages.Account
             {
                 var userData = GetLoginInfo(Username, Password);
 
-                HttpContext.Session.SetInt32("ID",userData.ID);
+                HttpContext.Session.SetInt32("ID",userData.ID);////
                 Models.Account act;
                 LoginError = string.Empty;
                 var account = _db.Accounts.Where(u => u.LoginID == userData.ID).FirstOrDefault();
@@ -126,6 +129,7 @@ namespace BankingApp.Pages.Account
                     _db.Accounts.Add(act);
                     await _db.SaveChangesAsync();
                 }
+                //remove this else statement
                 else
                     act = account;
                
