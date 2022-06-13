@@ -45,6 +45,10 @@ namespace BankingApp.Pages.Account
         public IActionResult OnGet()
         {
             //HttpContext.Session.Clear();
+            if (HttpContext.Session.Get("ID") != null)//checks if I'm already logged in
+            {
+                return RedirectToPage("/Account/Home");
+            }
 
             return Page();
         }

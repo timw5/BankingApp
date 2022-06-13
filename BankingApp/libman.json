@@ -7,6 +7,7 @@
       "destination": "wwwroot/lib/datatables/"
     },
     {
+      "type" :  "module",
       "library": "limonte-sweetalert2@11.4.17",
       "destination": "wwwroot/lib/limonte-sweetalert2/"
     }

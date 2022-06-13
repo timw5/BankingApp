@@ -59,6 +59,7 @@ namespace BankingApp.Pages.Account
         //that value is received to this method as "acntType"
         public IActionResult OnPostAddNewAccountAsync([FromBody]string? acntType)//[FromBody] attribute specifies the value is coming from a POST request
         {
+            
             if (HttpContext.Session.Get("ID") != null)
             {
                 this.ID = (int)HttpContext.Session.GetInt32("ID");
@@ -71,6 +72,7 @@ namespace BankingApp.Pages.Account
                 _Account = _User.Accounts;
                 Models.Account account = new(0, 0, user.Username, acntType, user.ID, user);
                 _User.Accounts.Add(account);
+                user.Accounts.Add(account);
                 _Account.Add(account);
                 _db.Accounts.Add(account);
                 _db.SaveChangesAsync().Wait();
@@ -154,25 +156,33 @@ namespace BankingApp.Pages.Account
 
         //this method is not used currently, but will be later
         //so ignore the code in it for now, it will change
-        public JsonResult OnGetTransactions(string type)
-        {
-            JsonResult js = new JsonResult("Hello World");
-            var x = Request.Query["val"];
-            JsonContent jc;
-            js.Value = x;
-            js.ContentType = "application/json";
-            js.StatusCode = 200;
-            
-            
+        //public IActionResult OnGetGetAccounts(string? ID)
+        //{
+        //    if (ID is not null) 
+        //    {
+
+        //        var user = _db.Users.Where(x => x.ID == int.Parse(ID)).FirstOrDefault();
+        //        if (user != null)
+        //        {
+        //            var accounts = _db.Accounts.Where(x => x.LoginID == user.ID).ToList();
+
+        //            List<JsonResult> list = new();
+        //            Dictionary<string, object> map = new();
+        //            foreach (var account in accounts)
+        //            {
+        //                list.Add(new(account.Type));
+        //            }
+        //            //var response = JSON
+        //            return response;
+        //        }
+
+        //    }
+        //    return new JsonResult("");
 
 
-            return js;
+        //}
 
-
-
-
-
-        }
-
+        
     }
+
 }

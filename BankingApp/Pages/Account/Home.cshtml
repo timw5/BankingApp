@@ -1,5 +1,6 @@
 ﻿@page
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
 @model BankingApp.Pages.Account.AccountModel
 
 @{
@@ -26,6 +27,12 @@
                         <div class="h3 fw-bold mb-2  linkto  text-center" :hover Onclick="GetTransactions" style="cursor: pointer" >@item.Type  </div>
                             <hr/>
                             <div class="col-sm-2 w-100 fw-bold text-center">
+                                AccountNumber:
+                            </div>
+                             <div class="col-sm-2 w-100 text-center" value="@item.ID">
+                                @item.ID.ToString()
+                            </div>
+                            <div class="col-sm-2 w-100 fw-bold text-center">
                                 Balance:
                             </div>
                             <div class="col-sm-2 w-100 text-center">
@@ -41,117 +48,23 @@
                 <button class= "btn btn-primary m-4 hidden" id="newacnt"   @*asp-page="/Account/Home" asp-page-handler="AddNewAccount"*@ > Add new Account</button>
                 @Html.AntiForgeryToken() @*Added anti-forgery token for ajax call*@
 
-                <a href="#" class="btn btn-primary m-4" type="button"  id="TransferFunds">Transfer Funds </a>
+                <button class="btn btn-primary m-4" value=""  id="transfer" >Transfer Funds </button>
             </div>
         </div>
     </div>
 
 @section scripts
-{
-    <script src="~/lib/limonte-sweetalert2/sweetalert2.all.js"></script>
-    <script type="text/javascript">
-        //Below is the method to add a new account
-        //We use AJAX, and an asynchronous POST request to send the selected option from sweet alert
-        //We then use the OnPostAddNewAccount method that can be found in our Home.cshtml.cs page
-        $("#newacnt").click(() => 
-        {
-            console.log("in newaccount function");
-            (async () => 
-            {
-
-                const inputOptions = new Promise((resolve) => 
-                {
-                    setTimeout(() => 
-                    {
-                        resolve
-                        ({
-                            'Savings': 'Savings',
-                            'Investment': 'Investment',
-                            'Checking': 'Checking'
-                        })//end resolve
-
-                    }, 1000)//end setTimeout
-
-                })//end inputOptions
-
-                const { value: acntType } = 
-                await Swal.fire
-                ({
-                    title: "Which type of account?",
-                    input: "radio",
-                    showCancelButton: true,
-                    showConfirmButton: true,
-                    inputOptions: inputOptions,
-                    inputValidator: (value) => 
-                    {
-                        if (!value) 
-                        {
-                            return "You must select an account";
-                        }//end if(!value)
-
-                    }//end input validator
-
-                })//end await Swal.fire
+{ 
+    <script src='~/lib/limonte-sweetalert2/sweetalert2.all.min.js'></script>
+    <script src="~/js/Home.js"></script>
+    <script>
+        const TransferInputOptions =  JSON.parse('@Html.Raw(Json.Serialize(@Model._Account.Select( x=>x.Type)))'); 
 
 
-                if (acntType) 
-                {
-                    const URL = './Home?handler=AddNewAccount';
-
-                    $.ajax
-                    ({
-                        type: 'POST',
-                        url: URL,
-                        async: true,
-                        beforeSend: function(xhr) 
-                        {
-                            xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
-                        },
-                        contentType: "application/json; charset=utf-8",
-                        dataType: 'json',
-                        data: JSON.stringify(acntType),
-                        success: function(data) 
-                        {
-                            location.reload();
-                        },
-                        error: function(error) 
-                        {
-                            console.log(`Error ${error}`);
-                        }//end error
-
-                    })//end ajax
-                    .then//ajax then
-                    (
-                        Swal.fire
-                        (
-                            'Account Created Succesfully',
-                            '',
-                            'success',
-
-                        )
-                        .then((result) => //Swal.fire.then
-                        {
-                            if (result.isConfirmed) 
-                            {
-                                window.location.reload();//reload to get database changes to the page
-
-                            }//end if(result.isConfirmed)
-
-                        })//end swal fire
-
-                    )//end ajax.then
-
-                }//end if(acntType)
-
-            })();//end async
-
-        });//end function
-
-    </script> @*End Script*@
-
-}@*End Section Script*@
+    </script>
 
 
-
+}
+    
 
   

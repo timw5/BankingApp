@@ -12,6 +12,8 @@ namespace BankingApp.Models
             var bsalt = GetSalt();
             Hash = HashPass(password, bsalt);
             Salt = SaltToString(bsalt);
+            Accounts = new List<Account>();
+
         }
 
         public Login(string username, string hash, string salt)//constructor for the Context (Entity Framework)
