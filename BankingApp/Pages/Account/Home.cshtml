@@ -47,7 +47,6 @@
             <div class="container w-100 text-center">
                 <button class= "btn btn-primary m-4 hidden" id="newacnt"   @*asp-page="/Account/Home" asp-page-handler="AddNewAccount"*@ > Add new Account</button>
                 @Html.AntiForgeryToken() @*Added anti-forgery token for ajax call*@
-                @Model.ID;
                 <button class="btn btn-primary m-4" value=""  id="transfer" >Transfer Funds </button>
             </div>
         </div>
