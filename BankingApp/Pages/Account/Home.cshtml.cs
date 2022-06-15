@@ -50,6 +50,42 @@ namespace BankingApp.Pages.Account
             _db = context;
         }
 
+        public async Task<IActionResult> OnPostTransferFunds([FromBody] dynamic? data)
+        {
+
+            if (data is not null)
+            {
+                var json = JsonConvert.DeserializeObject<IDictionary<string, string>>(data.ToString());
+                if (HttpContext.Session.Get("ID") != null)
+                {
+                    var ID = (int)HttpContext.Session.GetInt32("ID");
+
+                    int Toacntid = int.Parse(json["toID"]);
+                    int Fromacntid = int.Parse(json["fromID"]);
+                    int dollars = int.Parse(json["dollars"]);
+                    int cents = int.Parse(json["cents"]);
+                    var Toacnt = await _db.Accounts.Where(x => x.ID == Toacntid).FirstOrDefaultAsync();
+                    var Fromacnt = await _db.Accounts.Where(x => x.ID == Fromacntid).FirstOrDefaultAsync();
+
+                    if (Toacnt is not null && Fromacnt is not null)
+                    {
+                        Transfers t = new(Fromacntid, Toacntid, dollars, cents, "Transfer", Toacnt, Fromacnt);
+                        if (dollars <= 1 || Fromacnt.Dollars <= dollars)
+                        {
+                            return StatusCode(500, "Not enough funds to complete transfer");
+                        }
+                        Fromacnt.SubtractFunds(dollars, cents);
+                        Toacnt.AddFunds(dollars, cents);
+                        Fromacnt.Withdrawals.Add(t);
+                        Toacnt.Deposits.Add(t);
+                        _db.Transfers.Add(t);
+                        await _db.SaveChangesAsync();
+                    }
+                }
+            }
+            return Page();
+        }
+
 
         //This is the handler for the Add New Account button,
         //I use the Session Variable "ID" to get the user

@@ -61,6 +61,7 @@
     <script>
         //getting info for transfers
         const TransferInputOptions = JSON.parse('@Html.Raw(Json.Serialize(@Model._Account.Select( x=>x.Type)))');
+        const TransferInputOptionsIDs = JSON.parse('@Html.Raw(Json.Serialize(@Model._Account.Select( x=>x.ID)))');
     </script>
 
     <script> 

@@ -83,10 +83,11 @@ $("#newacnt").click(async() =>
 $("#transfer").click( async() =>
 {
     var Options;
-    for (let x in TransferInputOptions)
+    for (let x in TransferInputOptions, TransferInputOptionsIDs)
     {
         var temp = TransferInputOptions[x];
-        Options += `<option value=${temp}>${temp}</option>`
+        var ID = TransferInputOptionsIDs[x];
+        Options += `<option name = ${ID} value=${temp}>${temp}- Acnt Number:${ID}</option>`
     }
     var form =
     `
@@ -94,6 +95,7 @@ $("#transfer").click( async() =>
             <select class="form-select" id="swal-input-from" name="s1">
                 <option selected>Select an account</option>
                 ${Options}
+                <span> </span>
             </select>
             <label for="#st1"> From: </label>
         </div>
@@ -123,6 +125,10 @@ $("#transfer").click( async() =>
         preConfirm: () =>
         {
             var error = false;
+            //var ID = document.getElementById('swal-input-from').attributes("name")
+            var fromID = $('#swal-input-from').find(":selected").attr("name");
+            var toID = $('#swal-input-to').find(":selected").attr("name");
+
             var from = document.getElementById('swal-input-from').value;
             var to = document.getElementById('swal-input-to').value;
             var dollars = document.getElementById('swal-input-dollars').value;
@@ -149,10 +155,12 @@ $("#transfer").click( async() =>
 
             var response =
             {
-                "from" : from,
-                "to" : to,
-                "dollars" : dollars,
-                "cents" : cents
+                from : from.toString(),
+                to : to.toString(),
+                dollars : dollars.toString(),
+                cents: cents.toString(),
+                fromID: fromID.toString(),
+                toID: toID.toString()
             };
 
             return response;
@@ -164,12 +172,60 @@ $("#transfer").click( async() =>
     if (Transferdata)
     {
         //add ajax post to server to initiate a transfer
+        const URL = './Home?handler=TransferFunds';
+        $.ajax
+        ({
+            type: 'POST',
+            url: URL,
+            async: true,
+            beforeSend:(xhr) =>
+            {
+                xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(Transferdata),
+            showConfirmButton: true,
+            showCancelButton: true,
+            success: () =>
+            {
+                Swal.fire
+                ({
+                    title: 'Funds added Successfully!',
+                    html:
+                        `
+                    <div class="container text-center w-100 mx-auto">                    
+                        \$${Transferdata.dollars}.${Transferdata.cents} was transferred <br/> 
+                        from Account: ${Transferdata.fromID} <br/>
+                        to Account: ${Transferdata.toID}
+                    </div>
+                `,
+                    icon: 'success'
+                })
+                .then(() => //Swal.fire.then
+                {
+                    window.location.reload();//reload to get database changes to the page    
+                })
+            },
+            error:(jqXHR, textStatus, errorThrown) =>//errors if needed
+            {
+                Swal.fire
+                    ({
+                        title: "Error initiating transfer",
+                        text: jqXHR.responseText,
+                        icon: "error"
+                    })
+            }
+        })//end ajax
+
+
         await Swal.fire
         ({
             html:
             `
                 from account: ${Transferdata.from} <br/>
+                fromID: ${Transferdata.fromID} <br/>
                 to account: ${Transferdata.to} <br/>
+                To ID: ${Transferdata.toID} <br/>
                 amount: \$${Transferdata.dollars}.${Transferdata.cents} <br/>
             `
         });
@@ -231,7 +287,7 @@ addfunds = async (id) =>
             type: 'POST',
             url: URL,
             async: true,
-            beforeSend: function (xhr)
+            beforeSend: (xhr) =>
             {
                 xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
             },
@@ -257,7 +313,7 @@ addfunds = async (id) =>
                         window.location.reload();//reload to get database changes to the page    
                     })
             },
-            error: function (jqXHR, textStatus, errorThrown)//errors if needed
+            error: (jqXHR, textStatus, errorThrown) =>//errors if needed
             {
                 Swal.fire
                 ({
@@ -269,3 +325,6 @@ addfunds = async (id) =>
         })//end ajax
     }//end if
 };//end addfunds
+
+
+
