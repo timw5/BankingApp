@@ -113,7 +113,7 @@ namespace BankingApp.Pages.Account
                     user.Accounts.Add(account);
                     _Account.Add(account);
                     _db.Accounts.Add(account);
-                    await _db.SaveChangesAsync();
+                    await Task.Run(() =>_db.SaveChangesAsync());
                 }
             }
             return Page();
@@ -140,7 +140,7 @@ namespace BankingApp.Pages.Account
                         acnt.Deposits.Add(t);
                         acnt.AddFunds(dollars, cents);
                         _db.Transfers.Add(t);
-                        await _db.SaveChangesAsync();
+                        await Task.Run(() => _db.SaveChangesAsync());
                     }
                 }
             }
@@ -173,42 +173,43 @@ namespace BankingApp.Pages.Account
             if (HttpContext.Session.Get("ID") != null)
             {
                 this.ID = (int)HttpContext.Session.GetInt32("ID");
-            }
+            
 
-            var user = await _db.Users.Where(x=>x.ID == this.ID).FirstOrDefaultAsync();
+                var user = await _db.Users.Where(x=>x.ID == this.ID).FirstOrDefaultAsync();
 
-            if (user is not null)
-            {
-                _User = user;
-                var accounts = await _db.Accounts.Where(x=>x.LoginID == _User.ID).ToListAsync();
-                if (accounts is null || accounts.Count == 0)
+                if (user is not null)
                 {
-                    
-                    _User.Accounts = new List<Models.Account>();
-                    _Account = (List<Models.Account>)_User.Accounts;
-                    Models.Account act = new(0, 0, _User.Username, "Checking", this.ID, _User);
-                    _Account.Add(act);
-                    _db.Accounts.Add(act);
-                    await _db.SaveChangesAsync();
-                }
-                else if(_User.Accounts is null)
-                {
-                    _User.Accounts = new List<Models.Account>();
-                    _User.Accounts = accounts;
-                    _Account = accounts;
-                }
-                else
-                {
-                    _User.Accounts = accounts;
-                    _Account = (List<Models.Account>)_User.Accounts;
-                }
-                this.hidden = "inline-block";
+                    _User = user;
+                    var accounts = await _db.Accounts.Where(x => x.LoginID == _User.ID).ToListAsync();
+                    if (accounts is null || accounts.Count == 0)
+                    {
 
-                if (_Account.Count > 2)
-                {
-                    this.hidden = "none";
+                        _User.Accounts = new List<Models.Account>();
+                        _Account = (List<Models.Account>)_User.Accounts;
+                        Models.Account act = new(0, 0, _User.Username, "Checking", this.ID, _User);
+                        _Account.Add(act);
+                        _db.Accounts.Add(act);
+                        await Task.Run(() => _db.SaveChangesAsync());
+                    }
+                    else if (_User.Accounts is null)
+                    {
+                        _User.Accounts = new List<Models.Account>();
+                        _User.Accounts = accounts;
+                        _Account = accounts;
+                    }
+                    else
+                    {
+                        _User.Accounts = accounts;
+                        _Account = (List<Models.Account>)_User.Accounts;
+                    }
+                    this.hidden = "inline-block";
+
+                    if (_Account.Count > 2)
+                    {
+                        this.hidden = "none";
+                    }
+                    return Page();
                 }
-                return Page();
             }
             return RedirectToPage("/Account/Login");
         }
