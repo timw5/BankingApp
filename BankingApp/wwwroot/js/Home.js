@@ -138,14 +138,12 @@ $("#transfer").click( async() =>
             {
                 swal.close();
                 return false;
-
             }
 
             if (dollars == "")
             {
                 swal.close();
                 return false;
-
             }
 
             if (cents == "")
@@ -193,12 +191,12 @@ $("#transfer").click( async() =>
                     title: 'Funds added Successfully!',
                     html:
                         `
-                    <div class="container text-center w-100 mx-auto">                    
-                        \$${Transferdata.dollars}.${Transferdata.cents} was transferred <br/> 
-                        from Account: ${Transferdata.fromID} <br/>
-                        to Account: ${Transferdata.toID}
-                    </div>
-                `,
+                        <div class="container text-center w-100 mx-auto">                    
+                            \$${Transferdata.dollars}.${Transferdata.cents} was transferred <br/> 
+                            from Account: ${Transferdata.fromID} <br/>
+                            to Account: ${Transferdata.toID}
+                        </div>
+                        `,
                     icon: 'success'
                 })
                 .then(() => //Swal.fire.then
@@ -216,19 +214,6 @@ $("#transfer").click( async() =>
                     })
             }
         })//end ajax
-
-
-        await Swal.fire
-        ({
-            html:
-            `
-                from account: ${Transferdata.from} <br/>
-                fromID: ${Transferdata.fromID} <br/>
-                to account: ${Transferdata.to} <br/>
-                To ID: ${Transferdata.toID} <br/>
-                amount: \$${Transferdata.dollars}.${Transferdata.cents} <br/>
-            `
-        });
     }
         
 })
