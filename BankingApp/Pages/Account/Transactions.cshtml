@@ -5,11 +5,10 @@
     ViewData["Title"] = "Transactions";
 }
 
-<h1>Transactions</h1>
+<h3 class = "mt-4 text-center mx-auto"> Transactions </h3><br>
 
 <div>
     
-    <button id="test" type = "submit">@Model.test</button>
    
 </div>
 <div>
@@ -17,12 +16,10 @@
 </div>
 
 
-@section Scripts {
+@section scripts {
     <script>
-        function get() {
-
-            
-
-        }
+        $(document).ready(function() {
+            $('#example').DataTable();
+        });
     </script>
 }

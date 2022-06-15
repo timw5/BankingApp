@@ -23,8 +23,8 @@
             <div class="row container mx-auto w-100 ">
                 @foreach (var item in Model._Account)
                 {
-                    <div class="col-md-3 m-4 p-4 border rounded-2 shadow-lg mx-auto"  title="View Transactions" id="@item.ID" >
-                        <div class="h3 fw-bold mb-2  linkto  text-center" :hover Onclick="GetTransactions" style="cursor: pointer" >@item.Type  </div>
+                    <div class="col-md-3 m-4 p-4 border rounded-2 shadow-lg mx-auto" title="View Transactions" id="@item.ID" >
+                        <div class="h3 fw-bold mb-2  linkto  text-center" :hover Onclick="onelclick(@item.ID)" style="cursor: pointer" >@item.Type  </div>
                             <hr/>
                             <div class="col-sm-2 w-100 fw-bold text-center">
                                 AccountNumber:
@@ -60,6 +60,13 @@
     <script>
         const TransferInputOptions =  JSON.parse('@Html.Raw(Json.Serialize(@Model._Account.Select( x=>x.Type)))'); 
 
+        onelclick = (id) => {
+            Swal.fire({
+                $(document).ready(function() {
+                    $('#example').DataTable();
+                });
+            })
+        }
 
     </script>
 

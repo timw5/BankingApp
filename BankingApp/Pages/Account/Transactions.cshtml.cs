@@ -31,7 +31,6 @@ namespace BankingApp.Pages.Account
                 return RedirectToPage("/Account/Login");
             }
 
-            
             return Page();
         }
 
