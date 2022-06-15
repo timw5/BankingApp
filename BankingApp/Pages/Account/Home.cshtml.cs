@@ -70,7 +70,7 @@ namespace BankingApp.Pages.Account
                     if (Toacnt is not null && Fromacnt is not null)
                     {
                         Transfers t = new(Fromacntid, Toacntid, dollars, cents, "Transfer", Toacnt, Fromacnt);
-                        if (dollars <= 1 || Fromacnt.Dollars <= dollars)
+                        if (Fromacnt.Dollars <= 1 || Fromacnt.Dollars <= dollars)
                         {
                             return StatusCode(500, "Not enough funds to complete transfer");
                         }

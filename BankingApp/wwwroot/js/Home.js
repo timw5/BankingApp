@@ -128,7 +128,7 @@ $("#transfer").click( async() =>
             //var ID = document.getElementById('swal-input-from').attributes("name")
             var fromID = $('#swal-input-from').find(":selected").attr("name");
             var toID = $('#swal-input-to').find(":selected").attr("name");
-
+            
             var from = document.getElementById('swal-input-from').value;
             var to = document.getElementById('swal-input-to').value;
             var dollars = document.getElementById('swal-input-dollars').value;
