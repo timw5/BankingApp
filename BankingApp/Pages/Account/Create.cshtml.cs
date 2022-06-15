@@ -140,7 +140,6 @@ namespace BankingApp.Pages.Account
         //make this asynchronous
         public JsonResult OnPostCheckUsername()
         {
-
             var x = _db.Users.Where(x => x.Username == Username).ToList();
             
             if (x.Count == 0 || x is null)

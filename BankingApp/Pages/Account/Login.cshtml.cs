@@ -65,7 +65,7 @@ namespace BankingApp.Pages.Account
         public bool IsLoginValid(string username, string password)
         {
             var data = _db.Users.Where(u => u.Username == username).FirstOrDefault();
-            if (data is null || data == default)
+            if (data is null)
                 return false;
 
             var salt = Convert.FromBase64String(data.Salt);
@@ -90,10 +90,8 @@ namespace BankingApp.Pages.Account
 
         public IActionResult OnGetClearSession()
         {
-
             HttpContext.Session.Remove("ID");
             HttpContext.Session.Clear();
-
             return Page();
         }   
 
@@ -123,7 +121,7 @@ namespace BankingApp.Pages.Account
             {
                 var userData = GetLoginInfo(Username, Password);
 
-                HttpContext.Session.SetInt32("ID",userData.ID);////
+                HttpContext.Session.SetInt32("ID",userData.ID);
                 Models.Account act;
                 LoginError = string.Empty;
                 var account = _db.Accounts.Where(u => u.LoginID == userData.ID).FirstOrDefault();
@@ -131,19 +129,10 @@ namespace BankingApp.Pages.Account
                 {
                     act = new(0, 0, Username,"Checking", userData.ID, userData);
                     _db.Accounts.Add(act);
-                    await _db.SaveChangesAsync();
-                }
-                //remove this else statement
-                else
-                    act = account;
-               
+                    await Task.Run(() =>_db.SaveChangesAsync());
+                }               
                 return RedirectToPage( "/Account/Home");
             }
-
         }
-
- 
     }
-
-
 }
