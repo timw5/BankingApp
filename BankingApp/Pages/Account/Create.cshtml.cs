@@ -50,6 +50,14 @@ namespace BankingApp.Pages.Account
         public CreateModel(BankingAppContext db) { _db = db; }
 
 
+        public IActionResult OnPostkfdkl(int? id)
+        {
+            var transactions = _db.Transfers.Where(x => x.DepositAccountID == id);
+            JsonResult js = new(transactions);
+            return js;
+            
+        }
+
         //When this page is requested, we render the page
         public IActionResult OnGet()
         {

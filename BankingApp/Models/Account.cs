@@ -23,7 +23,7 @@ namespace BankingApp.Models
             Dollars = 0;
             Cents = 0;
             Name = String.Empty;
-            Type = "Checking";
+            Type = "";
             LoginID = 0;
             Login = default!;
             Withdrawals = new List<Transfers>();
