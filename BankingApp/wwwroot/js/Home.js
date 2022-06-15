@@ -1,6 +1,4 @@
-﻿
-
-//Below is the method to add a new account
+﻿//Below is the method to add a new account
 //We use AJAX, and an asynchronous POST request to send the selected option from sweet alert
 //We then use the OnPostAddNewAccount method that can be found in our Home.cshtml.cs page
 $("#newacnt").click(async() => 
@@ -11,7 +9,6 @@ $("#newacnt").click(async() =>
         'Investment': 'Investment',
         'Checking': 'Checking'
     }
-
     const { value: acntType } = 
     await new Swal
     ({
@@ -30,48 +27,10 @@ $("#newacnt").click(async() =>
         }//end input validator
 
     })//end await Swal.fire
-
-
     if (acntType) 
     {
         const URL = './Home?handler=AddNewAccount';
-
-        $.ajax
-        ({
-            type: 'POST',
-            url: URL,
-            async: true,
-            beforeSend: (xhr) =>
-            {
-                xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify(acntType),
-            success: () =>
-            {
-                Swal.fire
-                ({
-                    title: 'Account Created Succesfully',
-                    text: '',
-                    icon: 'success',
-                })
-                .then(() => //Swal.fire.then
-                {
-                    window.location.reload();//reload to get database changes to the page
-                })
-            },
-            error: () => 
-            {
-                Swal.fire
-                    ({
-                        title: "error",
-                        text: "oops, something went wrong",
-                        icon: "error"
-                    })
-            }//end error
-
-        })//end ajax
-
+        ajaxPost(URL, acntType, '', 'Account Created Succesfully');
     }//end if(acntType)
 
 });//end newacnt function
@@ -124,8 +83,6 @@ $("#transfer").click( async() =>
         focusConfirm: false,
         preConfirm: () =>
         {
-            var error = false;
-            //var ID = document.getElementById('swal-input-from').attributes("name")
             var fromID = $('#swal-input-from').find(":selected").attr("name");
             var toID = $('#swal-input-to').find(":selected").attr("name");
             
@@ -171,51 +128,16 @@ $("#transfer").click( async() =>
     {
         //add ajax post to server to initiate a transfer
         const URL = './Home?handler=TransferFunds';
-        $.ajax
-        ({
-            type: 'POST',
-            url: URL,
-            async: true,
-            beforeSend:(xhr) =>
-            {
-                xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify(Transferdata),
-            showConfirmButton: true,
-            showCancelButton: true,
-            success: () =>
-            {
-                Swal.fire
-                ({
-                    title: 'Funds added Successfully!',
-                    html:
-                        `
-                        <div class="container text-center w-100 mx-auto">                    
-                            \$${Transferdata.dollars}.${Transferdata.cents} was transferred <br/> 
-                            from Account: ${Transferdata.fromID} <br/>
-                            to Account: ${Transferdata.toID}
-                        </div>
-                        `,
-                    icon: 'success'
-                })
-                .then(() => //Swal.fire.then
-                {
-                    window.location.reload();//reload to get database changes to the page    
-                })
-            },
-            error:(jqXHR, textStatus, errorThrown) =>//errors if needed
-            {
-                Swal.fire
-                    ({
-                        title: "Error initiating transfer",
-                        text: jqXHR.responseText,
-                        icon: "error"
-                    })
-            }
-        })//end ajax
-    }
-        
+        const HTML =
+        `
+            <div class="container text-center w-100 mx-auto">
+                \$${Transferdata.dollars}.${Transferdata.cents} was transferred <br/> 
+                from Account: ${Transferdata.fromID} <br/>
+                to Account: ${Transferdata.toID}
+            </div>
+        `;
+        ajaxPost(URL, Transferdata, HTML, "Transfer successful!");
+    }    
 })
 
 
@@ -228,16 +150,16 @@ addfunds = async (id) =>
         title: "Add funds:",
         text: id,
         html:
-            `
-                <div class="input-group w-50 mx-auto mt-4">
-                    <span class="input-group-text">Dollars </span>
-                    <input id="swal-input-dollars1" type="number" min="0" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="form-control"/>
-                </div>
-                <div class="input-group w-50 mx-auto mt-4 mb-2">
-                    <span class="input-group-text">&nbsp;Cents&nbsp;</span>
-                    <input id="swal-input-cents1" type="number" max="99" pattern="[0-99]" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="form-control"/>
-                </div>
-            `,
+        `
+            <div class="input-group w-50 mx-auto mt-4">
+                <span class="input-group-text">Dollars </span>
+                <input id="swal-input-dollars1" type="number" min="0" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="form-control"/>
+            </div>
+            <div class="input-group w-50 mx-auto mt-4 mb-2">
+                <span class="input-group-text">&nbsp;Cents&nbsp;</span>
+                <input id="swal-input-cents1" type="number" max="99" pattern="[0-99]" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="form-control"/>
+            </div>
+        `,
         preConfirm: () =>
         {
             var dollars = $('#swal-input-dollars1').val();
@@ -267,49 +189,55 @@ addfunds = async (id) =>
     if (funds)
     {
         const URL = './Home?handler=AddFunds';
-        $.ajax
-        ({
-            type: 'POST',
-            url: URL,
-            async: true,
-            beforeSend: (xhr) =>
-            {
-                xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
-            },
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify(funds),
-            showConfirmButton: true,
-            showCancelButton: true,
-            success: () =>
-            {
-                Swal.fire
-                    ({
-                        title: 'Funds added Successfully!',
-                        html:
-                        `
-                            <div class="container text-center w-100 mx-auto">                    
-                                \$${funds.dollars}.${funds.cents} was deposited into Account: ${funds.ID}                                       
-                            </div>
-                        `,
-                        icon: 'success'
-                    })
-                    .then(() => //Swal.fire.then
-                    {
-                        window.location.reload();//reload to get database changes to the page    
-                    })
-            },
-            error: (jqXHR, textStatus, errorThrown) =>//errors if needed
-            {
-                Swal.fire
-                ({
-                    title: "error",
-                    text: "oops, something went wrong",
-                    icon: "error"
-                })
-            }
-        })//end ajax
+        const HTML =
+        `
+            <div class="container text-center w-100 mx-auto">
+                \$${funds.dollars}.${funds.cents} was deposited into Account: ${funds.ID}
+            </div>
+        `;
+        ajaxPost(URL, funds, HTML, "Funds added successfully")
     }//end if
 };//end addfunds
 
 
+
+ajaxPost = (URL, data, successhtml, successTitle) =>
+{
+    $.ajax
+    ({
+        type: 'POST',
+        url: URL,
+        async: true,
+        beforeSend: (xhr) =>
+        {
+            xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+        },
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(data),
+        showConfirmButton: true,
+        showCancelButton: true,
+        success: () =>
+        {
+            Swal.fire
+            ({
+                title: successTitle,
+                html: successhtml,
+                icon: 'success'
+            })
+            .then(() => //Swal.fire.then
+            {
+                window.location.reload();//reload to get database changes to the page    
+            })//end swal.fire.then
+        },//end success
+        error: (jqXHR, textStatus, errorThrown) =>//errors if needed
+        {
+            Swal.fire
+            ({
+                title: "error",
+                text: jqXHR.responseText,
+                icon: "error"
+            })//end swal.fire(error)
+        }//end error
+    })//end ajax
+}//end ajaxpost function
 

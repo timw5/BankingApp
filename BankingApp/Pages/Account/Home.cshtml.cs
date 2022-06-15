@@ -41,8 +41,6 @@ namespace BankingApp.Pages.Account
         //to be displayed if there are alread 3 accounts.
         public string hidden {get; set;} 
 
-
-
         //constructor for this model
         public AccountModel(BankingApp.Data.BankingAppContext context)
         {
@@ -50,12 +48,14 @@ namespace BankingApp.Pages.Account
             _db = context;
         }
 
+
         public async Task<IActionResult> OnPostTransferFunds([FromBody] dynamic? data)
         {
 
             if (data is not null)
             {
                 var json = JsonConvert.DeserializeObject<IDictionary<string, string>>(data.ToString());
+                //data is now a dictionary
                 if (HttpContext.Session.Get("ID") != null)
                 {
                     var ID = (int)HttpContext.Session.GetInt32("ID");
@@ -64,6 +64,7 @@ namespace BankingApp.Pages.Account
                     int Fromacntid = int.Parse(json["fromID"]);
                     int dollars = int.Parse(json["dollars"]);
                     int cents = int.Parse(json["cents"]);
+
                     var Toacnt = await _db.Accounts.Where(x => x.ID == Toacntid).FirstOrDefaultAsync();
                     var Fromacnt = await _db.Accounts.Where(x => x.ID == Fromacntid).FirstOrDefaultAsync();
 
@@ -79,7 +80,7 @@ namespace BankingApp.Pages.Account
                         Fromacnt.Withdrawals.Add(t);
                         Toacnt.Deposits.Add(t);
                         _db.Transfers.Add(t);
-                        await _db.SaveChangesAsync();
+                        await Task.Run(() => _db.SaveChangesAsync());
                     }
                 }
             }
@@ -96,23 +97,24 @@ namespace BankingApp.Pages.Account
         ///s "acntType"   
         public async Task<IActionResult> OnPostAddNewAccount([FromBody]string? acntType)//[FromBody] attribute specifies the value is coming from a POST request
         {
-            
+
             if (HttpContext.Session.Get("ID") != null)
             {
                 this.ID = (int)HttpContext.Session.GetInt32("ID");
-            }
-            var user = await _db.Users.Where(x => x.ID == this.ID).FirstOrDefaultAsync();
-            
-            if (user is not null && acntType is not null)
-            {
-                _User = user;
-                _Account = (List<Models.Account>)_User.Accounts;
-                Models.Account account = new(0, 0, user.Username, acntType, user.ID, user);
-                _User.Accounts.Add(account);
-                user.Accounts.Add(account);
-                _Account.Add(account);
-                _db.Accounts.Add(account);
-                await _db.SaveChangesAsync();
+
+                var user = await _db.Users.Where(x => x.ID == this.ID).FirstOrDefaultAsync();
+
+                if (user is not null && acntType is not null)
+                {
+                    _User = user;
+                    _Account = (List<Models.Account>)_User.Accounts;
+                    Models.Account account = new(0, 0, user.Username, acntType, user.ID, user);
+                    _User.Accounts.Add(account);
+                    user.Accounts.Add(account);
+                    _Account.Add(account);
+                    _db.Accounts.Add(account);
+                    await _db.SaveChangesAsync();
+                }
             }
             return Page();
         }
