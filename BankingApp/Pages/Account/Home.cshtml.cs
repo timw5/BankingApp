@@ -14,8 +14,6 @@ using Newtonsoft.Json;
 
 namespace BankingApp.Pages.Account
 {
-    //[ValidateAntiForgeryToken]
-
     public class AccountModel : PageModel
     {
         //database context variable
@@ -38,7 +36,7 @@ namespace BankingApp.Pages.Account
         [BindProperty]
         [Required]
         //property for managing the "Add New Account" button, I dont want it
-        //to be displayed if there are alread 3 accounts.
+        //to be displayed if there are already 3 accounts.
         public string hidden {get; set;} 
 
         //constructor for this model
@@ -48,14 +46,13 @@ namespace BankingApp.Pages.Account
             _db = context;
         }
 
-
         public async Task<IActionResult> OnPostTransferFunds([FromBody] dynamic? data)
         {
 
             if (data is not null)
             {
                 var json = JsonConvert.DeserializeObject<IDictionary<string, string>>(data.ToString());
-                //data is now a dictionary
+                //data is now a dictionary (json)
                 if (HttpContext.Session.Get("ID") != null)
                 {
                     var ID = (int)HttpContext.Session.GetInt32("ID");
