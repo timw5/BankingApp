@@ -10,7 +10,7 @@ using BankingApp.Models;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using System.Web;
-
+using Newtonsoft.Json;
 
 namespace BankingApp.Pages.Account
 {
@@ -26,7 +26,7 @@ namespace BankingApp.Pages.Account
 
         //list of accounts attached to the current user
         [BindProperty, Required]
-        public ICollection<Models.Account> _Account { get; set; } = default!;
+        public List<Models.Account> _Account { get; set; } = default!;
 
         //user currently logged in
         [BindProperty]
@@ -41,8 +41,6 @@ namespace BankingApp.Pages.Account
         //to be displayed if there are alread 3 accounts.
         public string hidden {get; set;} 
 
-
-
         //constructor for this model
         public AccountModel(BankingApp.Data.BankingAppContext context)
         {
@@ -51,40 +49,103 @@ namespace BankingApp.Pages.Account
         }
 
 
+        public async Task<IActionResult> OnPostTransferFunds([FromBody] dynamic? data)
+        {
+
+            if (data is not null)
+            {
+                var json = JsonConvert.DeserializeObject<IDictionary<string, string>>(data.ToString());
+                //data is now a dictionary
+                if (HttpContext.Session.Get("ID") != null)
+                {
+                    var ID = (int)HttpContext.Session.GetInt32("ID");
+
+                    int Toacntid = int.Parse(json["toID"]);
+                    int Fromacntid = int.Parse(json["fromID"]);
+                    int dollars = int.Parse(json["dollars"]);
+                    int cents = int.Parse(json["cents"]);
+
+                    var Toacnt = await _db.Accounts.Where(x => x.ID == Toacntid).FirstOrDefaultAsync();
+                    var Fromacnt = await _db.Accounts.Where(x => x.ID == Fromacntid).FirstOrDefaultAsync();
+
+                    if (Toacnt is not null && Fromacnt is not null)
+                    {
+                        Transfers t = new(Fromacntid, Toacntid, dollars, cents, "Transfer", Toacnt, Fromacnt);
+                        if (Fromacnt.Dollars <= 1 || Fromacnt.Dollars <= dollars)
+                        {
+                            return StatusCode(500, "Not enough funds to complete transfer");
+                        }
+                        Fromacnt.SubtractFunds(dollars, cents);
+                        Toacnt.AddFunds(dollars, cents);
+                        Fromacnt.Withdrawals.Add(t);
+                        Toacnt.Deposits.Add(t);
+                        _db.Transfers.Add(t);
+                        await Task.Run(() => _db.SaveChangesAsync());
+                    }
+                }
+            }
+            return Page();
+        }
+
+
         //This is the handler for the Add New Account button,
         //I use the Session Variable "ID" to get the user
         //that owns this account
         //I query the database for the user information
         //I then add a new account with the name provided from the javascript ajax POST call
-        //that value is received to this method as "acntType"
-        public IActionResult OnPostAddNewAccountAsync([FromBody]string? acntType)//[FromBody] attribute specifies the value is coming from a POST request
+        //that value is received to this method a
+        ///s "acntType"   
+        public async Task<IActionResult> OnPostAddNewAccount([FromBody]string? acntType)//[FromBody] attribute specifies the value is coming from a POST request
         {
-            
+
             if (HttpContext.Session.Get("ID") != null)
             {
                 this.ID = (int)HttpContext.Session.GetInt32("ID");
+
+                var user = await _db.Users.Where(x => x.ID == this.ID).FirstOrDefaultAsync();
+
+                if (user is not null && acntType is not null)
+                {
+                    _User = user;
+                    _Account = (List<Models.Account>)_User.Accounts;
+                    Models.Account account = new(0, 0, user.Username, acntType, user.ID, user);
+                    _User.Accounts.Add(account);
+                    user.Accounts.Add(account);
+                    _Account.Add(account);
+                    _db.Accounts.Add(account);
+                    await Task.Run(() =>_db.SaveChangesAsync());
+                }
             }
-            var user = _db.Users.Where(x => x.ID == this.ID).FirstOrDefaultAsync().Result;
-            
-            if (user is not null && acntType is not null)
-            {
-                _User = user;
-                _Account = _User.Accounts;
-                Models.Account account = new(0, 0, user.Username, acntType, user.ID, user);
-                _User.Accounts.Add(account);
-                user.Accounts.Add(account);
-                _Account.Add(account);
-                _db.Accounts.Add(account);
-                _db.SaveChangesAsync().Wait();
-            }
-           
-            
-            
             return Page();
         }
         
+        public async Task<IActionResult> OnPostAddFunds([FromBody]dynamic? data)
+        {
+            if (data is not null)
+            {
+                var json = JsonConvert.DeserializeObject<IDictionary<string, string>>(data.ToString());
+                //json is now a dictionary containing the json data sent from javascript
 
+                int acntid = int.Parse(json["ID"]);
+                int dollars = int.Parse(json["dollars"]);
+                int cents = int.Parse(json["cents"]);
 
+                if (HttpContext.Session.Get("ID") != null)
+                {
+                    var id = HttpContext.Session.GetInt32("ID");
+                    var acnt =  await _db.Accounts.Where(x => x.ID == acntid).FirstAsync();
+                    if (acnt is not null)
+                    {
+                        Transfers t = new Transfers(acntid, acntid, dollars, cents, "Deposit", acnt, acnt);
+                        acnt.Deposits.Add(t);
+                        acnt.AddFunds(dollars, cents);
+                        _db.Transfers.Add(t);
+                        await Task.Run(() => _db.SaveChangesAsync());
+                    }
+                }
+            }
+            return Page();
+        }
 
 
         //all users start out with a default "Checking" account
@@ -112,77 +173,45 @@ namespace BankingApp.Pages.Account
             if (HttpContext.Session.Get("ID") != null)
             {
                 this.ID = (int)HttpContext.Session.GetInt32("ID");
-            }
+            
 
-            var user = await _db.Users.Where(x=>x.ID == this.ID).FirstOrDefaultAsync();
+                var user = await _db.Users.Where(x=>x.ID == this.ID).FirstOrDefaultAsync();
 
-            if (user is not null)
-            {
-                _User = user;
-                var accounts = await _db.Accounts.Where(x=>x.LoginID == _User.ID).ToListAsync();
-                if (accounts is null || accounts.Count == 0)
+                if (user is not null)
                 {
-                    
-                    _User.Accounts = new List<Models.Account>();
-                    _Account = _User.Accounts;
-                    Models.Account act = new(0, 0, _User.Username, "Checking", this.ID, _User);
-                    _Account.Add(act);
-                    _db.Accounts.Add(act);
-                    await _db.SaveChangesAsync();
-                }
-                else if(_User.Accounts is null)
-                {
-                    _User.Accounts = new List<Models.Account>();
-                    _User.Accounts = accounts;
-                    _Account = accounts;
-                }
-                else
-                {
-                    _User.Accounts = accounts;
-                    _Account = _User.Accounts;
-                }
-                this.hidden = "inline-block";
+                    _User = user;
+                    var accounts = await _db.Accounts.Where(x => x.LoginID == _User.ID).ToListAsync();
+                    if (accounts is null || accounts.Count == 0)
+                    {
 
-                if (_Account.Count > 2)
-                {
-                    this.hidden = "none";
+                        _User.Accounts = new List<Models.Account>();
+                        _Account = (List<Models.Account>)_User.Accounts;
+                        Models.Account act = new(0, 0, _User.Username, "Checking", this.ID, _User);
+                        _Account.Add(act);
+                        _db.Accounts.Add(act);
+                        await Task.Run(() => _db.SaveChangesAsync());
+                    }
+                    else if (_User.Accounts is null)
+                    {
+                        _User.Accounts = new List<Models.Account>();
+                        _User.Accounts = accounts;
+                        _Account = accounts;
+                    }
+                    else
+                    {
+                        _User.Accounts = accounts;
+                        _Account = (List<Models.Account>)_User.Accounts;
+                    }
+                    this.hidden = "inline-block";
+
+                    if (_Account.Count > 2)
+                    {
+                        this.hidden = "none";
+                    }
+                    return Page();
                 }
-                return Page();
             }
             return RedirectToPage("/Account/Login");
         }
-
-
-
-        //this method is not used currently, but will be later
-        //so ignore the code in it for now, it will change
-        //public IActionResult OnGetGetAccounts(string? ID)
-        //{
-        //    if (ID is not null) 
-        //    {
-
-        //        var user = _db.Users.Where(x => x.ID == int.Parse(ID)).FirstOrDefault();
-        //        if (user != null)
-        //        {
-        //            var accounts = _db.Accounts.Where(x => x.LoginID == user.ID).ToList();
-
-        //            List<JsonResult> list = new();
-        //            Dictionary<string, object> map = new();
-        //            foreach (var account in accounts)
-        //            {
-        //                list.Add(new(account.Type));
-        //            }
-        //            //var response = JSON
-        //            return response;
-        //        }
-
-        //    }
-        //    return new JsonResult("");
-
-
-        //}
-
-        
     }
-
 }

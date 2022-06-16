@@ -23,8 +23,9 @@
             <div class="row container mx-auto w-100 ">
                 @foreach (var item in Model._Account)
                 {
+                    
                     <div class="col-md-3 m-4 p-4 border rounded-2 shadow-lg mx-auto" title="View Transactions" id="@item.ID" >
-                        <div class="h3 fw-bold mb-2  linkto  text-center" :hover Onclick="onelclick(@item.ID)" style="cursor: pointer" >@item.Type  </div>
+                        <div class="h3 fw-bold mb-2  linkto  text-center" :hover onclick="onelclick(@item.ID)" value="@item.ID" style="cursor: pointer" >@item.Type  </div>
                             <hr/>
                             <div class="col-sm-2 w-100 fw-bold text-center">
                                 AccountNumber:
@@ -38,16 +39,16 @@
                             <div class="col-sm-2 w-100 text-center">
                                 @item.BalanceToString()
                             </div>
-                        <div class="col-sm-2 w-100 text-center">
-                            <button class="btn btn-success mt-4 mx-auto justify-content-center" id="#AddFunds" type="button">Add Funds</button> @*add funds button*@
+                        <div class="col-sm-2 w-100 text-center addfundscontainer">
+                            <button class="btn btn-success mt-4 mx-auto justify-content-center" Onclick="addfunds(@item.ID)" value="@item.ID">Add Funds</button> @*add funds button*@
                         </div>
                     </div>
+
                 }@*End Foreach*@
             </div>
             <div class="container w-100 text-center">
                 <button class= "btn btn-primary m-4 hidden" id="newacnt"   @*asp-page="/Account/Home" asp-page-handler="AddNewAccount"*@ > Add new Account</button>
                 @Html.AntiForgeryToken() @*Added anti-forgery token for ajax call*@
-
                 <button class="btn btn-primary m-4" value=""  id="transfer" >Transfer Funds </button>
             </div>
         </div>
@@ -58,7 +59,12 @@
     <script src='~/lib/limonte-sweetalert2/sweetalert2.all.min.js'></script>
     <script src="~/js/Home.js"></script>
     <script>
-        const TransferInputOptions =  JSON.parse('@Html.Raw(Json.Serialize(@Model._Account.Select( x=>x.Type)))'); 
+        //getting info for transfers
+        const TransferInputOptions = JSON.parse('@Html.Raw(Json.Serialize(@Model._Account.Select( x=>x.Type)))');
+        const TransferInputOptionsIDs = JSON.parse('@Html.Raw(Json.Serialize(@Model._Account.Select( x=>x.ID)))');
+    </script>
+
+    <script> 
 
         onelclick = (id) => {
             Swal.fire({
@@ -69,7 +75,6 @@
         }
 
     </script>
-
 
 }
     
