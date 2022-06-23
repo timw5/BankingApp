@@ -214,8 +214,6 @@ ajaxPost = (URL, data, successhtml, successTitle) =>
         },
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(data),
-        showConfirmButton: true,
-        showCancelButton: true,
         success: () =>
         {
             Swal.fire

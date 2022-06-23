@@ -15,6 +15,13 @@
     .hidden {
         display: @Model.hidden!important;
     }
+    .swal2-popup
+    {
+        width: 1000px!important;
+/*        margin: auto!important; 
+        transform: translateX(-50%)!important;*/
+    }
+
 </style>
 
     <div class="container shadow-lg border rounded-3">
@@ -25,7 +32,7 @@
                 {
                     
                     <div class="col-md-3 m-4 p-4 border rounded-2 shadow-lg mx-auto" title="View Transactions" id="@item.ID" >
-                        <div class="h3 fw-bold mb-2  linkto  text-center" :hover onclick="onelclick(@item.ID)" value="@item.ID" style="cursor: pointer" >@item.Type  </div>
+                        <div class="h3 fw-bold mb-2  linkto  text-center" :hover Onclick=onelclick(@item.ID) value="@item.ID" style="cursor: pointer" >@item.Type  </div>
                             <hr/>
                             <div class="col-sm-2 w-100 fw-bold text-center">
                                 AccountNumber:
@@ -66,15 +73,104 @@
 
     <script> 
 
+
         //Garret's todo:
         onelclick = (id) => 
         {
-            Swal.fire
-            ({ 
-                title: "Heres the ID",
-                text: `${id}`,
-            })
+            //swal.fire({
+            //    title:'test',
+            //    text:'',
+            //    icon: 'error',
+            //})
+            const URL = './Home?handler=GetTransactions';
+            
+            var promise = ajaxGetTransaction(id, URL);
+            
         }
+
+            ajaxGetTransaction = (id, URL) => {
+               return Promise.resolve($.ajax
+                    ({
+                        type: 'POST',
+                        url: URL,
+                        async: true,
+                        beforeSend: (xhr) =>
+                        {
+                            xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(id),
+                        success: (data) =>
+                        {
+                            mydata = JSON.parse(data);
+                            table =
+                                `
+                                <table class="table">
+                                  <thead>
+                                    <tr>
+                                      <th scope="col">#</th>
+                                      <th scope="col">Time</th>
+                                      <th scope="col">Amount</th>
+                                      <th scope="col">Type</th>
+                                      <th scope="col">Withdrawal Account ID</th>
+                                      <th scope="col">Deposit account ID</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                            `;
+
+                            for (let i = 0; i < mydata.length; i++) 
+                            {
+                                temp = mydata[i].Time;
+                                time = temp.substring(0, 10);
+                                table +=
+                                `
+                                    <tr>
+                                      <th scope="row">${i+1}</th>
+                                      <td>${time}</td>
+                                      <td>\$${mydata[i].Dollars}.${mydata[i].Cents}</td>
+                                      <td>${mydata[i].Type}</td>
+                                      <td>${mydata[i].WithdrawAccountID}</td>
+                                      <td>${mydata[i].DepositAccountID}</td>
+                                    </tr>
+                                `
+                            }
+                            table += 
+                            `  
+                            </tbody>
+                                </table>
+                            `;
+
+                            swal.fire({
+                                title: "MyData",
+                                html: table,
+                                customClass: { 'popup' : 'swal2-popup'},
+
+                            })
+                        }              
+        //    Swal.fire
+        //    ({
+        //        title: successTitle,
+        //        html: successhtml,
+        //        icon: 'success'
+        //    })
+        //    .then(() => //Swal.fire.then
+        //    {
+        //        window.location.reload();//reload to get database changes to the page    
+        //    })//end swal.fire.then
+        //},//end success
+        //error: (jqXHR, textStatus, errorThrown) =>//errors if needed
+        //{
+        //    Swal.fire
+        //    ({
+        //        title: "error",
+        //        text: jqXHR.responseText,
+        //        icon: "error"
+        //    })//end swal.fire(error)
+        //}//end error
+                    })//end ajax
+                )
+}
 
     </script>
 
