@@ -48,6 +48,16 @@ namespace BankingApp.Pages.Account
             _db = context;
         }
 
+        public JsonResult OnPostGetTransactions([FromBody] dynamic? data)
+        {
+            var json = JsonConvert.DeserializeObject<string>(data.ToString());
+            int ID = int.Parse(json);
+            List<Transfers> transfers = new List<Transfers>();
+            transfers = _db.Transfers.Where(x => x.DepositAccountID == ID || x.WithdrawAccountID == ID).OrderByDescending(x => x.Time).ToList();
+            var transactions = JsonConvert.SerializeObject(transfers);
+            return new JsonResult(transactions);
+
+        }
 
         public async Task<IActionResult> OnPostTransferFunds([FromBody] dynamic? data)
         {
@@ -78,8 +88,11 @@ namespace BankingApp.Pages.Account
                         Fromacnt.SubtractFunds(dollars, cents);
                         Toacnt.AddFunds(dollars, cents);
                         Fromacnt.Withdrawals.Add(t);
+                        _db.Update(Toacnt);
+                        _db.Update(Fromacnt);
                         Toacnt.Deposits.Add(t);
                         _db.Transfers.Add(t);
+                        
                         await Task.Run(() => _db.SaveChangesAsync());
                     }
                 }
